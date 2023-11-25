@@ -1,4 +1,4 @@
-# 🌀 Mizu Quruma 💧
+# 💧 Mizu Quruma 🌀
 
 Your gateway to the core of machine learning.
 
