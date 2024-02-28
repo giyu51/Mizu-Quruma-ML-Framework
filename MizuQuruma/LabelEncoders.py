@@ -25,6 +25,8 @@ class StringToIntEncoder:
 
         Raises ⛔:
             - `ValueError`: If the encoder has already been fitted.
+            - `TypeError`: If the `vocabulary` parameter is not an iterable object.
+            - `ValueError`: If the provided vocabulary is empty.
         """
         if self.encoder_is_fit:
             raise ValueError("Encoder has already been fitted.")
