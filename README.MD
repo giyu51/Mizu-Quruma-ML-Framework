@@ -41,9 +41,10 @@ Embark on your journey into the world of Machine Learning with **Mizu Quruma** �
 
 ---
 
-📊 **Introducing the First Module**
+📊 **Introducing the Added Module**
 
-Our inaugural module features a **linear regression** model, meticulously crafted to provide beginners with a deep understanding at the **foundational level**. Dive into our comprehensive documentation, which covers both the mathematical underpinnings and programming aspects, ensuring a holistic learning experience.
+1. KNearestNeighbours
+
 
 ---
 <!-- maintain the core message while using simpler language. -->
