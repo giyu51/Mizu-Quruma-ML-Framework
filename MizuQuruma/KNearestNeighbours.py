@@ -13,7 +13,7 @@ from .internal_methods import (
 
 from .LabelEncoders import StringToIntEncoder
 from .model_selection import save_instance, load_instance
-from .metrics import ClassificationMetrics
+from .Metrics import ClassificationMetrics
 from .message_formatter import format_message
 
 
