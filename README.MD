@@ -21,31 +21,29 @@ Thank you for your continued support and enthusiasm.
 
 Best regards,
 
-
 # 💧 Mizu Quruma 🌀
 
-Your gateway to the core of machine learning.
+Your gateway to the core of machine learning, perfect for beginners!
 
 ---
 
-I decided to explore the world of Machine Learning and understand how it works at a fundamental level. This curiosity led me to create my own Machine Learning library, named **Mizu Quruma**.
+Embark on your journey into the world of Machine Learning with **Mizu Quruma** – an ideal starting point for beginners eager to explore the fundamentals.
 
-⚠️ Please keep in mind that this project is a work in progress, continuously growing with new features and capabilities.
+⚠️ Please note that **Mizu Quruma** is an ongoing project, continuously expanding with new features and capabilities.
 
 ---
 
-#### Meaning of the name?
+#### What's in a Name?
 
-💧 **Mizu** (**Water** from japanese). Machine learning is all about **adaptability** and **fluidity**. Our framework is designed to **smoothly** adapt to different datasets and tasks, much like **water** effortlessly flows and adapts to its environment.
+💧 **Mizu** (**Water** in Japanese): Machine learning embodies **adaptability** and **fluidity**, much like the way water effortlessly conforms to its surroundings. Our framework smoothly adapts to different datasets and tasks, ensuring a seamless learning experience.
 
-🌀 **Quruma** (**Wheel** from japanese). Just as a wheel **keeps turning** and **moving forward**, our framework is dynamic and constantly **evolving**. It symbolizes our commitment to staying at the forefront of machine learning advancements and always **progressing**
+🌀 **Quruma** (**Wheel** in Japanese): Just as a wheel **keeps turning** and **moves forward**, our framework is dynamic and continuously **evolving**. It symbolizes our commitment to guiding beginners through the ever-progressing landscape of machine learning.
 
 ---
 
 📊 **Introducing the First Module**
 
-The initial component of my comprehensive framework is a **linear regression** model. What sets this project apart is its emphasis on delivering a deep understanding at the **foundational level**, delving into the mathematical intricacies beneath the surface. As a result, you'll discover comprehensive documentation that encompasses both the mathematical and programming aspects.
+Our inaugural module features a **linear regression** model, meticulously crafted to provide beginners with a deep understanding at the **foundational level**. Dive into our comprehensive documentation, which covers both the mathematical underpinnings and programming aspects, ensuring a holistic learning experience.
 
 ---
-
 <!-- maintain the core message while using simpler language. -->
