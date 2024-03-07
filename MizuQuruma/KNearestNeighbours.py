@@ -11,10 +11,10 @@ from .internal_methods import (
     simultaneous_shuffle,
 )
 
-from .LabelEncoders import StringToIntEncoder
-from .model_selection import save_instance, load_instance
-from .Metrics import ClassificationMetrics
-from .message_formatter import format_message
+from LabelEncoders import StringToIntEncoder
+from model_selection import save_instance, load_instance
+from Metrics import ClassificationMetrics
+from message_formatter import format_message
 
 
 class KNN:
