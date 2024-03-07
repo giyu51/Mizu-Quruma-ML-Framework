@@ -58,25 +58,46 @@ class StringToIntEncoder:
         """
         Fit the encoder to the given vocabulary, mapping each unique label to an integer index.
 
-        Args🛠️:
-            - `vocabulary` (Iterable[str]): The vocabulary containing unique labels to be encoded.
+        ---
+
+        Description 📖:
+        - This method fits the encoder to the provided vocabulary, mapping each unique label to an integer index.
 
         ---
 
-        Returns📤:
-            - `Dict[str, int]`: A dictionary mapping each unique label to its corresponding integer index.
+        Parameters ⚒️:
+        - `vocabulary` (Iterable[str]): The vocabulary containing unique labels to be encoded.
+
+        ---
+
+        Returns 📥:
+        - `Dict[str, int]`: A dictionary mapping each unique label to its corresponding integer index.
 
         ---
 
         Raises ⛔:
-            - `ValueError`: If the encoder has already been fitted.
-            - `TypeError`: If the `vocabulary` parameter is not an iterable object.
-            - `ValueError`: If the provided vocabulary is empty.
+        - `ValueError`: If the encoder has already been fitted.
+        - `TypeError`: If the `vocabulary` parameter is not an iterable object.
+        - `ValueError`: If the provided vocabulary is empty.
+
+        ---
+
+        Example 🎯:
+        ```
+        # Create an instance of StringToIntEncoder
+        encoder = StringToIntEncoder()
+
+        # Fit the encoder to a vocabulary
+        vocabulary = ['apple', 'banana', 'orange']
+        label_mapping = encoder.fit(vocabulary)
+
+        print(label_mapping)
+        ```
         """
+
         if self.encoder_is_fit:
             error_message = "Encoder has already been fitted."
             display_error(error_message=error_message, error_type=ValueError)
-
         if not isinstance(vocabulary, Iterable):
             error_message = "The `vocabulary` parameter must be an iterable object."
             display_error(error_message=error_message, error_type=TypeError)
