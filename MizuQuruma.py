@@ -1,3 +1,4 @@
+import pyaudio
 import numpy as np
 from collections.abc import Iterable
 from typing import Literal, Tuple
