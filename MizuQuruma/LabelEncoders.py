@@ -1,6 +1,6 @@
 from typing import Iterable, Callable, Any, Dict, NoReturn
 from .message_formatter import format_message
-from .model_selection import save_instance
+from .model_selection import save_instance, load_instance
 import numpy as np
 from .internal_methods import to_numpy
 
@@ -81,21 +81,23 @@ class StringToIntEncoder:
         self.reverse_label_mapping = {}
         self.encoder_is_fit = False
 
-    def ensure_encoder_is_fit(func: Callable[..., Any]) -> Callable[..., Any]:
+    def _decorator_is_model_trained(
+        _function: Callable[..., Any]
+    ) -> Callable[..., Any]:
         """
         Decorator to ensure that the encoder is fitted before calling a method.
 
-        Description 📝:
-
-            - This decorator checks whether the encoder is fitted before allowing
-        the decorated method to be called. If the encoder is not fitted, it raises
-        a RuntimeError indicating that the encoder must be fitted first using the
+        Description 📖:
+        - This decorator checks whether the encoder is fitted before allowing
+        the decorated method to be called.
+        - If the encoder is not fitted, it raises a RuntimeError indicating that
+        the encoder must be fitted first using the
         `fit()` method.
 
         ---
 
-        Args 🛠️:
-            - `func` (callable): The method to be decorated.
+        Parameters 🛠️:
+            - `_function` (Callable[..., Any]): The method to be decorated.
 
         ---
 
@@ -110,10 +112,10 @@ class StringToIntEncoder:
 
         def wrapper(self, *args, **kwargs):
             if not self.encoder_is_fit:
-                message = f"To use `{func.__name__}()`, the encoder should be fitted using `fit()`"
+                message = f"To use `{_function.__name__}()`, the encoder should be fitted using `fit()`"
                 message = format_message(msg=message, msg_type="error")
                 raise RuntimeError(message)
-            return func(self, *args, **kwargs)
+            return _function(self, *args, **kwargs)
 
         return wrapper
 
@@ -141,7 +143,7 @@ class StringToIntEncoder:
             message = format_message(msg=message, msg_type="error")
             raise ValueError(message)
 
-    @ensure_encoder_is_fit
+    @_decorator_is_model_trained
     def encode(
         self, X: np.array, replace_unknown=True, unknown_symbol: int = -1
     ) -> np.ndarray:
@@ -173,7 +175,7 @@ class StringToIntEncoder:
         )
         return encoded_list
 
-    @ensure_encoder_is_fit
+    @_decorator_is_model_trained
     def decode(
         self, X: np.array, replace_unknown=True, unknown_symbol: str = "?"
     ) -> np.ndarray:
@@ -205,13 +207,23 @@ class StringToIntEncoder:
         )
         return decoded_list
 
-    @ensure_encoder_is_fit
-    def save(self, filename: str = "StringToInt_encoder.pkl") -> None:
+    @_decorator_is_model_trained
+    def save_encoder(self, filename: str = "StringToInt_encoder.pkl") -> None:
         """
         Save the encoder instance to a file using pickle serialization.
 
-        Args🛠️:
+        Parameters 🛠️:
             - `filename` (str): The filename to save the encoder instance to. Default is 'StringToInt_encoder.pkl'.
+
+        ---
+
+        Returns 📥:
+            - None
+
+
+        Raises ⛔:
+            - `TypeError`: If the instance cannot be serialized using pickle.
+            - `FileNotFoundError`: If the specified file or directory does not exist.
 
         ---
 
@@ -219,16 +231,30 @@ class StringToIntEncoder:
             >>> # Save the encoder instance to a file named 'encoder.pkl'
             encoder = StringToIntEncoder()
             encoder.fit(vocabulary)
-            encoder.save("encoder.pkl")
-
-        ---
-
-        Raises ⛔:
-            - `TypeError`: If the instance cannot be serialized using pickle.
-            - `FileNotFoundError`: If the specified file or directory does not exist.
+            encoder.save_encoder("encoder.pkl")
         """
 
         save_instance(self, filename=filename)
+
+    def load_encoder(self, filename: str = "StringToInt_encoder.pkl") -> Any:
+        """
+        Load the encoder instance from a file using pickle deserialization.
+
+        Args:
+            filename (str): The filename to load the encoder instance from. Default is 'StringToInt_encoder.pkl'.
+
+        Returns:
+            Any: The loaded encoder instance.
+
+        Example:
+            >>> # Load the encoder instance from a file named 'encoder.pkl'
+            >>> encoder = StringToIntEncoder()
+            >>> encoder = encoder.load_encoder("encoder.pkl")
+
+        Raises:
+            FileNotFoundError: If the specified file or directory does not exist.
+        """
+        return load_instance(filename=filename)
 
 
 """

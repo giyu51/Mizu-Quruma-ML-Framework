@@ -142,7 +142,9 @@ class KNN:
         # Initialization of Encoder
         self.label_encoder = StringToIntEncoder()
 
-    def _decorator_is_model_trained(_function: Callable[..., Any]):
+    def _decorator_is_model_trained(
+        _function: Callable[..., Any]
+    ) -> Callable[..., Any]:
         """
         Decorator to check if the model is trained before executing a method.
 
@@ -160,7 +162,7 @@ class KNN:
         ---
 
         Returns 📥:
-        - A wrapper function that checks if the model is trained before executing the decorated function.
+            - `callable`: The wrapper function.
 
         ---
 
