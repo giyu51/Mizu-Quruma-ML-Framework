@@ -1,7 +1,9 @@
 from typing import Iterable, Callable, Any, Dict, NoReturn
+
+import numpy as np
+
 from .message_formatter import format_message
 from .model_selection import save_instance, load_instance
-import numpy as np
 from .internal_methods import to_numpy
 
 

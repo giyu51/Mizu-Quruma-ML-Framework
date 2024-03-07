@@ -3,9 +3,27 @@ import numpy as np
 from .message_formatter import format_message
 
 
-def display_error(error_message: str, error_type: Type[Exception]) -> NoReturn:
+def display_error(
+    error_message: str, error_type: Type[Exception] = Exception
+) -> NoReturn:
     error_message = format_message(msg=error_message, msg_type="error")
     raise error_type(error_message)
+
+
+def display_warning(warning_message: str, print_function=None) -> None:
+    if print_function is None:
+        print_function = print
+
+    warning_message = format_message(msg=warning_message, msg_type="warning")
+    print_function(warning_message)
+
+
+def display_info(info_message: str, print_function=None) -> None:
+    if print_function is None:
+        print_function = print
+
+    info_message = format_message(msg=info_message, msg_type="info")
+    print_function(info_message)
 
 
 def validate_shapes(
@@ -259,4 +277,3 @@ def to_numpy(_arr: Iterable) -> np.ndarray:
 #         validate_shapes(array_1, array_2, metrics, ignore_empty_arrays)
 #     except ValueError as e:
 #         print(e)  # Ensure that it raises a ValueError
-
