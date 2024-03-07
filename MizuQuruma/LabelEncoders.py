@@ -2,6 +2,7 @@ from typing import Iterable, Callable, Any, Dict, NoReturn
 from .message_formatter import format_message
 from .model_selection import save_instance
 import numpy as np
+from .internal_methods import to_numpy
 
 
 class StringToIntEncoder:
@@ -79,45 +80,6 @@ class StringToIntEncoder:
         self.label_mapping = {}
         self.reverse_label_mapping = {}
         self.encoder_is_fit = False
-
-    def to_numpy(self, _arr: Iterable) -> np.ndarray:
-        """
-        Convert an iterable to a numpy array.
-
-        Description 📝:
-            - This method automatically handles conversion of iterable data (e.g., lists, tuples)
-                to numpy arrays, making it easy to work with various data formats.
-
-            - If the input is already a numpy array, the method returns the input array itself.
-
-        ---
-
-        Args 🛠️:
-            - `_arr` (Iterable): The iterable to be converted.
-
-        ---
-
-        Returns 📤:
-            - `np.ndarray`: The numpy array resulting from the conversion, or the input array if it is already a numpy array.
-
-        ---
-
-        Raises ⛔:
-            - `ValueError`: If the conversion fails due to invalid input data.
-            - `RuntimeError`: If an unexpected error occurs during conversion.
-        """
-        try:
-            numpy_array = np.array(_arr) if not isinstance(_arr, np.ndarray) else _arr
-            return numpy_array
-        except ValueError as ve:
-            message = f"Failed to convert input to numpy array:\n {ve}"
-            message = format_message(msg=message, msg_type="error")
-            raise ValueError(message)
-        except Exception as e:
-            message = f"An unexpected error occurred:\n {e}"
-            message = format_message(msg=message, msg_type="error")
-
-            raise RuntimeError(message)
 
     def ensure_encoder_is_fit(func: Callable[..., Any]) -> Callable[..., Any]:
         """

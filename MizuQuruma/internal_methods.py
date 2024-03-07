@@ -1,6 +1,5 @@
 from typing import Any, Iterable, List, Literal, get_args, Callable
 import numpy as np
-from icecream import ic
 from .message_formatter import format_message
 
 

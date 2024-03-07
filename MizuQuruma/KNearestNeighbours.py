@@ -314,8 +314,8 @@ class KNN:
         )
 
         # Update class variables accordingly to input and output arrays
-        self.X_train = self._to_numpy(X_train)
-        self.y_train = self._to_numpy(y_train)
+        self.X_train = to_numpy(X_train)
+        self.y_train = to_numpy(y_train)
 
         # Let encoder remember the whole vocabulary
         self.label_encoder.fit(vocabulary=self.y_train)
@@ -541,8 +541,8 @@ class KNN:
         )
 
         # Ensure type consistency (np.ndarray)
-        X_test = self._to_numpy(X_test)
-        y_test = self._to_numpy(y_test)
+        X_test = to_numpy(X_test)
+        y_test = to_numpy(y_test)
 
         # Predict test labels
         y_real = y_test
@@ -653,10 +653,10 @@ class KNN:
             desired_type=Iterable,
             function=self.predict,
         )
-        X_test = self._to_numpy(X_test)
+        X_test = to_numpy(X_test)
 
         predictions = [self._predict(sample) for sample in X_test]
-        predictions = self._to_numpy(predictions)
+        predictions = to_numpy(predictions)
         return predictions
 
     def _predict(self, sample: np.ndarray) -> str:
@@ -703,7 +703,7 @@ class KNN:
             desired_type=Iterable,
             function=self._predict,
         )
-        sample = self._to_numpy(sample)
+        sample = to_numpy(sample)
 
         distances = self._get_euclidean_distance(sample, self.X_train)
 
@@ -776,8 +776,8 @@ class KNN:
             function=self._get_euclidean_distance,
         )
 
-        array_1 = self._to_numpy(array_1)
-        array_2 = self._to_numpy(array_2)
+        array_1 = to_numpy(array_1)
+        array_2 = to_numpy(array_2)
 
         euclidean_distance = np.sqrt(np.sum((array_1 - array_2) ** 2, axis=-1))
         return euclidean_distance
@@ -1075,20 +1075,6 @@ class KNN:
         ```
         """
         return load_instance(filename=filename)
-
-    def _to_numpy(self, array: Iterable) -> np.ndarray:
-        """
-        Internal function to convert an iterable to a numpy array.
-
-        Example 🎯:
-        ```
-        # Convert a list to a numpy array
-        array = [1, 2, 3]
-        numpy_array = _to_numpy(array)
-        print(numpy_array)
-        ```
-        """
-        return to_numpy(array)
 
     def _validate_shapes(
         self,
