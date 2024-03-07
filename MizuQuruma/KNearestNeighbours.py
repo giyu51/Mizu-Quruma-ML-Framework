@@ -2,19 +2,21 @@ import numpy as np
 
 from matplotlib import pyplot as plt
 from matplotlib.colors import ListedColormap
-from typing import Literal, List, Dict, Callable, Any, Iterable, Tuple, Union
+from typing import Literal, List, Dict, Callable, Any, Iterable, Tuple
 from ctypes import ArgumentError
 from .internal_methods import (
     validate_types,
     validate_shapes,
     to_numpy,
     simultaneous_shuffle,
+    display_error,
+    display_info,
+    display_warning,
 )
 
 from .LabelEncoders import StringToIntEncoder
 from .model_selection import save_instance, load_instance
 from .Metrics import ClassificationMetrics
-from .message_formatter import format_message
 
 
 class KNN:
@@ -107,11 +109,10 @@ class KNN:
 
         # Handle the case if both `K` and `neighbour_number` provided but the values of them are different.
         if self.neigbour_number is not None and self.K != self.neigbour_number:
-            err_message = (
+            error_message = (
                 "`K` and `neighbour_number` attributes must have the same value."
             )
-            err_message = format_message(msg=err_message, msg_type="error")
-            raise ValueError(err_message)
+            display_error(error_message=error_message, error_type=ValueError)
 
         self.user_guide_data = None
         self.welcome_message: str | None = None
@@ -181,9 +182,9 @@ class KNN:
 
         def wrapper(self, *args, **kwargs):
             if not self.model_is_trained:
-                err_message = f"First, train the model using the `fit()` method before using the `{_function.__name__}()` method."
-                err_message = format_message(msg=err_message, msg_type="error")
-                raise RuntimeError(err_message)
+                error_message = f"First, train the model using the `fit()` method before using the `{_function.__name__}()` method."
+                display_error(error_message=error_message, error_type=RuntimeError)
+
             return _function(self, *args, **kwargs)
 
         return wrapper
@@ -218,7 +219,7 @@ class KNN:
         if self.verbose == 2:
             print(message)
 
-    def _display_info_message(self, message: str):
+    def _display_info_message(self, info_message: str):
         """
         Internal method to display an informational message based on the verbosity level.
 
@@ -231,7 +232,7 @@ class KNN:
         ---
 
         Parameters ⚒️:
-        - `message (str)`: The informational message to be displayed.
+        - `info_message (str)`: The informational message to be displayed.
 
         ---
 
@@ -247,8 +248,7 @@ class KNN:
         ```
         """
         if self.verbose > 0:
-            info_message = format_message(msg=message, msg_type="info")
-            print(info_message)
+            display_info(info_message=info_message)
 
     def show_workflow(self):
 
@@ -524,9 +524,8 @@ class KNN:
         """
 
         if any(metric not in self.evaluation_metric_names for metric in metrics):
-            err_message = f"Choose correct metric names.\nGot: {metrics}.\nExpected: One of {self.evaluation_metric_names}"
-            err_message = format_message(msg=err_message, msg_type="error")
-            raise ArgumentError(err_message)
+            error_message = f"Choose correct metric names.\nGot: {metrics}.\nExpected: One of {self.evaluation_metric_names}"
+            display_error(error_message=error_message, error_type=ArgumentError)
 
         self._validate_shapes(X_test, y_test, metrics="check_sample_count")
         self._validate_types(
@@ -850,9 +849,8 @@ class KNN:
         """
         available_metrics = ["training", "testing", "decision_boundary"]
         if any(metric not in available_metrics for metric in metrics):
-            err_message = f"Choose correct metric names.\nGot: {metrics}.\nExpected: One of {available_metrics}"
-            err_message = format_message(msg=err_message, msg_type="error")
-            raise ArgumentError(err_message)
+            error_message = f"Choose correct metric names.\nGot: {metrics}.\nExpected: One of {available_metrics}"
+            display_error(error_message=error_message, error_type=ArgumentError)
 
         X_train = self.X_train
         y_train = self.y_train
@@ -922,9 +920,8 @@ class KNN:
                     )
                 plt.legend()
             else:
-                err_message = f"To plot `testing` metrics, function requires parameters `X_test` and `y_test` not to equal `None`"
-                err_message = format_message(msg=err_message, msg_type="warning")
-                print(err_message)
+                warning_message = f"To plot `testing` metrics, function requires parameters `X_test` and `y_test` not to equal `None`"
+                display_warning(warning_message=warning_message)
 
         if save_plot:
             plt.savefig(filename)

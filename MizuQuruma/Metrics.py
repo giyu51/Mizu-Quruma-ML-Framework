@@ -1,6 +1,6 @@
 import numpy as np
 from typing import Iterable, Tuple
-from .message_formatter import format_message
+from .internal_methods import display_error
 
 
 class ClassificationMetrics:
@@ -89,14 +89,12 @@ class ClassificationMetrics:
             fn = self.to_numpy(fn)
 
         if np.any(tp < 0) or np.any(fn < 0):
-            message = "The number of true positives (tp) and false negatives (fn) must be non-negative."
-            message = format_message(msg=message, msg_type="error")
-            raise ValueError(message)
+            error_message = "The number of true positives (tp) and false negatives (fn) must be non-negative."
+            display_error(error_message=error_message, error_type=ValueError)
 
         if np.all(tp == 0) and np.all(fn == 0):
-            message = "Both tp and fn cannot be zero simultaneously."
-            message = format_message(msg=message, msg_type="error")
-            raise ValueError(message)
+            error_message = "Both tp and fn cannot be zero simultaneously."
+            display_error(error_message=error_message, error_type=ValueError)
 
         sensitivity = np.sum(tp) / (np.sum(tp) + np.sum(fn))
 
@@ -119,9 +117,8 @@ class ClassificationMetrics:
             fp = self.to_numpy(fp)
 
         if np.any(tp < 0) or np.any(fp < 0):
-            message = "The number of true positives (tp) and false positives (fp) must be non-negative."
-            message = format_message(msg=message, msg_type="error")
-            raise ValueError(message)
+            error_message = "The number of true positives (tp) and false positives (fp) must be non-negative."
+            display_error(error_message=error_message, error_type=ValueError)
 
         precision = np.sum(tp) / (np.sum(tp) + np.sum(fp))
         return precision
@@ -139,9 +136,8 @@ class ClassificationMetrics:
             fn = self.to_numpy(fn)
 
         if np.any(tp < 0) or np.any(fp < 0) or np.any(fn < 0):
-            message = "The number of true positives (tp), false positives (fp), and false negatives (fn) must be non-negative."
-            message = format_message(msg=message, msg_type="error")
-            raise ValueError(message)
+            error_message = "The number of true positives (tp), false positives (fp), and false negatives (fn) must be non-negative."
+            display_error(error_message=error_message, error_type=ValueError)
 
         precision = self.calculate_precision(np.sum(tp), np.sum(fp))
         recall = self.calculate_sensitivity(np.sum(tp), np.sum(fn))
@@ -161,9 +157,8 @@ class ClassificationMetrics:
 
         if np.any(tn < 0) or np.any(fp < 0):
 
-            message = "The number of true negatives (tn) and false positives (fp) must be non-negative."
-            message = format_message(msg=message, msg_type="error")
-            raise ValueError(message)
+            error_message = "The number of true negatives (tn) and false positives (fp) must be non-negative."
+            display_error(error_message=error_message, error_type=ValueError)
 
         specificity = np.sum(tn) / (np.sum(tn) + np.sum(fp))
         return specificity
@@ -174,14 +169,12 @@ class ClassificationMetrics:
             return numpy_array
 
         except ValueError as ve:
-            message = f"Failed to convert input to numpy array:\n {ve}"
-            message = format_message(msg=message, msg_type="error")
-            raise ValueError(message)
+            error_message = f"Failed to convert input to numpy array:\n {ve}"
+            display_error(error_message=error_message, error_type=ValueError)
 
         except Exception as e:
-            message = f"An unexpected error occurred:\n {e}"
-            message = format_message(msg=message, msg_type="error")
-            raise RuntimeError(message)
+            error_message = f"An unexpected error occurred:\n {e}"
+            display_error(error_message=error_message, error_type=RuntimeError)
 
     def get_confusion_matrix(self):
         return self.confusion_matrix
