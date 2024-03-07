@@ -118,29 +118,54 @@ class StringToIntEncoder:
         self.encoder_is_fit = True
         return self.label_mapping
 
-    def reset(self) -> None:
+    def reset_encoder(self) -> None:
         """
         Reset the state of the StringToIntEncoder instance.
 
         Description📝:
-            - This method resets the state of the StringToIntEncoder instance by clearing
-            the label mappings and setting the encoder's fit status to False. This can
-            be useful when you want to clear the encoder's state and start fresh,
-            for example, when you want to fit the encoder with a new vocabulary.
+        - This method resets the state of the StringToIntEncoder instance by clearing
+        the label mappings and setting the encoder's fit status to False. This can
+        be useful when you want to clear the encoder's state and start fresh,
+        for example, when you want to fit the encoder with a new vocabulary.
+
+        ---
+
+        Parameters ⚒️:
+        - None
+
+        ---
+
+        Returns 📥:
+        - None
+
+        ---
+
+        Raises ⛔:
+        - None
 
         ---
 
         Example💡:
-            >>> encoder = StringToIntEncoder()
-            >>> encoder.fit(['apple', 'banana'])
-            >>> encoder.reset()
-            >>> encoder.fit(['orange', 'kiwi'])
+        ```
+        # Create an instance of StringToIntEncoder
+        encoder = StringToIntEncoder()
+
+        # Fit the encoder to a vocabulary
+        vocabulary = ['apple', 'banana']
+        encoder.fit(vocabulary)
+
+        # Reset the encoder
+        encoder.reset_encoder()
+
+        # Fit the encoder with a new vocabulary
+        encoder.fit(['orange', 'kiwi'])
+        ```
 
         ---
 
         Note⚠️:
-            After calling this method, the encoder will no longer retain any information
-            about previously fitted vocabularies or encoded labels.
+        After calling this method, the encoder will no longer retain any information
+        about previously fitted vocabularies or encoded labels.
         """
         self.label_mapping = {}
         self.reverse_label_mapping = {}
@@ -152,27 +177,35 @@ class StringToIntEncoder:
         """
         Decorator to ensure that the encoder is fitted before calling a method.
 
+        ---
+
         Description 📖:
-        - This decorator checks whether the encoder is fitted before allowing
-        the decorated method to be called.
-        - If the encoder is not fitted, it raises a RuntimeError indicating that
-        the encoder must be fitted first using the
-        `fit()` method.
+        - This decorator checks whether the encoder is fitted before allowing the decorated method to be called.
+        - If the encoder is not fitted, it raises a RuntimeError indicating that the encoder must be fitted first using the `fit()` method.
 
         ---
 
-        Parameters 🛠️:
-            - `_function` (Callable[..., Any]): The method to be decorated.
+        Parameters ⚒️:
+        - `_function` (Callable[..., Any]): The method to be decorated.
 
         ---
 
         Returns 📤:
-            - `callable`: The wrapper function.
+        - `callable`: The wrapper function.
 
         ---
 
         Raises ⛔:
-            - `RuntimeError`: If the encoder is not fitted.
+        - `RuntimeError`: If the encoder is not fitted.
+
+        ---
+
+        Example 🎯:
+        ```python
+        @_decorator_is_model_trained
+        def some_method(self, *args, **kwargs):
+            # Method implementation
+        ```
         """
 
         def wrapper(self, *args, **kwargs):
@@ -187,17 +220,37 @@ class StringToIntEncoder:
         self, X: np.array, test_elements: Iterable
     ) -> None | NoReturn:
         """
-        Check for unknown symbols in the input array X.
-        Raise a ValueError if any unknown symbols are found.
+        ⚠️ INTERNAL METHOD
 
-        Args 🛠️:
-            - `X` (np.array): The input array to check for unknown symbols.
-            - `test_elements` (Iterable): The elements to test for membership in the input array.
+        Check for unknown symbols in the input array X.
+
+        ---
+
+        Description 📖:
+        - This method checks for unknown symbols in the input array `X`. It raises a `ValueError` if any unknown symbols are found.
+
+        ---
+
+        Parameters ⚒️:
+        - `X (np.array)`: The input array to check for unknown symbols.
+        - `test_elements (Iterable)`: The elements to test for membership in the input array.
 
         ---
 
         Raises ⛔:
-            - `ValueError`: If any unknown symbols are found in the input array.
+        - `ValueError`: If any unknown symbols are found in the input array.
+
+        ---
+
+        Example 🎯:
+        ```
+        # Define test data
+        X = np.array([[1, 2], [3, 4], [5, 6]])
+        test_elements = [2, 4, 6]
+
+        # Check for unknown symbols
+        _check_unknown_symbols(X, test_elements)
+        ```
         """
         unknown_mask = np.isin(X, test_elements, invert=True)
         if np.any(unknown_mask):
@@ -213,21 +266,42 @@ class StringToIntEncoder:
         """
         Encode the input array using the fitted label encoder.
 
-        Args 🛠️:
-            - `X` (np.array): The input array to be encoded.
-            - `replace_unknown` (bool): Whether to replace unknown labels with the specified `unknown_symbol`.
-            - `unknown_symbol` (int): The value to use for unknown labels if `replace_unknown` is True.
+        ---
+
+        Description 📖:
+        - This method encodes the input array `X` using the fitted label encoder.
+        - Optionally, it can replace unknown labels with the specified `unknown_symbol`.
+        - If any unknown labels are encountered and `replace_unknown` is False, a ValueError is raised.
+
+        ---
+
+        Parameters ⚒️:
+        - `X (np.array)`: The input array to be encoded.
+        - `replace_unknown (bool)`: Whether to replace unknown labels with the specified `unknown_symbol`. By defualt is `True`.
+        - `unknown_symbol (int)`: The value to use for unknown labels if `replace_unknown` is True. By default is `-1`
 
         ---
 
         Returns 📤:
-            - `np.ndarray`: The encoded array.
+        - `np.ndarray`: The encoded array.
 
         ---
 
         Raises ⛔:
-            - `ValueError`: If any unknown labels are encountered and `replace_unknown` is False.
-            - `RuntimeError`: If the encoder is not fitted.
+        - `ValueError`: If any unknown labels are encountered and `replace_unknown` is False.
+        - `RuntimeError`: If the encoder is not fitted.
+
+        ---
+
+        Example 🎯:
+        ```
+        # Define input array
+        X = np.array(['apple', 'banana', 'orange'])
+
+        # Encode the input array
+        encoded_array = knn.encode(X, replace_unknown=True, unknown_symbol=-1)
+        print(encoded_array)
+        ```
         """
         X = to_numpy(X)
         if not replace_unknown:
@@ -245,21 +319,45 @@ class StringToIntEncoder:
         """
         Decode the input array using the fitted label decoder.
 
-        Args 🛠️:
-            - `X` (np.array): The input array to be decoded.
-            - `replace_unknown` (bool): Whether to replace unknown labels with the specified `unknown_symbol`.
-            - `unknown_symbol` (str): The symbol to use for unknown labels if `replace_unknown` is True.
+        ---
+
+        Description 📖:
+        - This method decodes the input array `X` using the fitted label decoder.
+        - Optionally, it can replace unknown labels with the specified `unknown_symbol`.
+        - If any unknown labels are encountered and `replace_unknown` is False, a ValueError is raised.
+
+        ---
+
+        Parameters ⚒️:
+        - `X (np.array)`: The input array to be decoded.
+        - `replace_unknown (bool)`: Whether to replace unknown labels with the specified `unknown_symbol`. By default is `True`
+        - `unknown_symbol (str)`: The symbol to use for unknown labels if `replace_unknown` is True. By default is `"?"`
 
         ---
 
         Returns 📤:
-            - `np.ndarray`: The decoded array.
+        - `np.ndarray`: The decoded array.
 
         ---
 
         Raises ⛔:
-            - `ValueError`: If any unknown labels are encountered and `replace_unknown` is False.
-            - `RuntimeError`: If the encoder is not fitted.
+        - `ValueError`: If any unknown labels are encountered and `replace_unknown` is False.
+        - `RuntimeError`: If the encoder is not fitted.
+
+        ---
+
+        Example 🎯:
+        ```
+        # Define input array
+        X = np.array(['apple', 'banana', 'orange'])
+
+        # Encode input array
+        encoded_X = knn.encode(X)
+
+        # Decode the input array
+        decoded_array = knn.decode(encoded_X, replace_unknown=True, unknown_symbol='?')
+        print(decoded_array)
+        ```
         """
         X = to_numpy(X)
         if not replace_unknown:
@@ -275,26 +373,37 @@ class StringToIntEncoder:
         """
         Save the encoder instance to a file using pickle serialization.
 
-        Parameters 🛠️:
-            - `filename` (str): The filename to save the encoder instance to. Default is 'StringToInt_encoder.pkl'.
+        ---
+
+        Description 📖:
+        - This method saves the encoder instance to a file using pickle serialization.
+        - The encoder instance is saved to the specified `filename` using the default filename 'StringToInt_encoder.pkl' if not provided.
+
+        ---
+
+        Parameters ⚒️:
+        - `filename (str)`: The filename to save the encoder instance to. Default is 'StringToInt_encoder.pkl'.
 
         ---
 
         Returns 📥:
-            - None
+        - None
 
+        ---
 
         Raises ⛔:
-            - `TypeError`: If the instance cannot be serialized using pickle.
-            - `FileNotFoundError`: If the specified file or directory does not exist.
+        - `TypeError`: If the instance cannot be serialized using pickle.
+        - `FileNotFoundError`: If the specified file or directory does not exist.
 
         ---
 
         Example 🎯:
-            >>> # Save the encoder instance to a file named 'encoder.pkl'
-            encoder = StringToIntEncoder()
-            encoder.fit(vocabulary)
-            encoder.save_encoder("encoder.pkl")
+        ```
+        # Save the encoder instance to a file named 'encoder.pkl'
+        encoder = StringToIntEncoder()
+        encoder.fit(vocabulary)
+        encoder.save_encoder("encoder.pkl")
+        ```
         """
 
         save_instance(self, filename=filename)
@@ -303,19 +412,35 @@ class StringToIntEncoder:
         """
         Load the encoder instance from a file using pickle deserialization.
 
-        Args:
-            filename (str): The filename to load the encoder instance from. Default is 'StringToInt_encoder.pkl'.
+        ---
 
-        Returns:
-            Any: The loaded encoder instance.
+        Description 📖:
+        - This method loads the encoder instance from a file using pickle deserialization.
+        - The encoder instance is loaded from the specified `filename` using the default filename 'StringToInt_encoder.pkl' if not provided.
 
-        Example:
-            >>> # Load the encoder instance from a file named 'encoder.pkl'
-            >>> encoder = StringToIntEncoder()
-            >>> encoder = encoder.load_encoder("encoder.pkl")
+        ---
 
-        Raises:
-            FileNotFoundError: If the specified file or directory does not exist.
+        Parameters ⚒️:
+        - `filename (str)`: The filename to load the encoder instance from. Default is 'StringToInt_encoder.pkl'.
+
+        ---
+
+        Returns 📥:
+        - Any: The loaded encoder instance.
+
+        ---
+
+        Raises ⛔:
+        - `FileNotFoundError`: If the specified file or directory does not exist.
+
+        ---
+
+        Example 🎯:
+        ```
+        # Load the encoder instance from a file named 'encoder.pkl'
+        encoder = StringToIntEncoder()
+        encoder = encoder.load_encoder("encoder.pkl")
+        ```
         """
         return load_instance(filename=filename)
 

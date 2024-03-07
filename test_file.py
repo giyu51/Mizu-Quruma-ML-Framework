@@ -23,4 +23,3 @@ my_plot = model.plot_data(X_test, y_test)
 my_plot.show()
 
 # ---
-
