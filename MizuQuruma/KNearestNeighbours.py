@@ -920,7 +920,7 @@ class KNN:
                     )
                 plt.legend()
             else:
-                warning_message = f"To plot `testing` metrics, function requires parameters `X_test` and `y_test` not to equal `None`"
+                warning_message = f"To plot `testing` metrics, parameters `X_test` and `y_test` shouldn't to equal `None`."
                 display_warning(warning_message=warning_message)
 
         if save_plot:
