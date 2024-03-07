@@ -209,7 +209,7 @@ class StringToIntEncoder:
             - `ValueError`: If any unknown labels are encountered and `replace_unknown` is False.
             - `RuntimeError`: If the encoder is not fitted.
         """
-        X = self.to_numpy(X)
+        X = to_numpy(X)
         if not replace_unknown:
             self._check_unknown_symbols(X, list(self.label_mapping.keys()))
 
@@ -241,7 +241,7 @@ class StringToIntEncoder:
             - `ValueError`: If any unknown labels are encountered and `replace_unknown` is False.
             - `RuntimeError`: If the encoder is not fitted.
         """
-        X = self.to_numpy(X)
+        X = to_numpy(X)
         if not replace_unknown:
             self._check_unknown_symbols(X, list(self.reverse_label_mapping.keys()))
 
