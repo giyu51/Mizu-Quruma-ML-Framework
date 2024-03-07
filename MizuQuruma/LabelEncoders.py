@@ -2,9 +2,8 @@ from typing import Iterable, Callable, Any, Dict, NoReturn
 
 import numpy as np
 
-from .message_formatter import format_message
 from .model_selection import save_instance, load_instance
-from .internal_methods import to_numpy
+from .internal_methods import to_numpy, display_error
 
 
 class StringToIntEncoder:
@@ -75,15 +74,15 @@ class StringToIntEncoder:
             - `ValueError`: If the provided vocabulary is empty.
         """
         if self.encoder_is_fit:
-            raise ValueError("Encoder has already been fitted.")
+            error_message = "Encoder has already been fitted."
+            display_error(error_message=error_message, error_type=ValueError)
+
         if not isinstance(vocabulary, Iterable):
-            message = "The `vocabulary` parameter must be an iterable object."
-            message = format_message(msg=message, msg_type="error")
-            raise TypeError(message)
+            error_message = "The `vocabulary` parameter must be an iterable object."
+            display_error(error_message=error_message, error_type=TypeError)
         if len(vocabulary) == 0:
-            message = "Provided vocabulary cannot be empty. Please provide non-empty vocabulary for fitting the encoder."
-            message = format_message(msg=message, msg_type="error")
-            raise ValueError(message)
+            error_message = "Provided vocabulary cannot be empty. Please provide non-empty vocabulary for fitting the encoder."
+            display_error(error_message=error_message, error_type=ValueError)
 
         unique_labels = np.unique(vocabulary)
 
@@ -157,9 +156,8 @@ class StringToIntEncoder:
 
         def wrapper(self, *args, **kwargs):
             if not self.encoder_is_fit:
-                message = f"To use `{_function.__name__}()`, the encoder should be fitted using `fit()`"
-                message = format_message(msg=message, msg_type="error")
-                raise RuntimeError(message)
+                error_message = f"To use `{_function.__name__}()`, the encoder should be fitted using `fit()`"
+                display_error(error_message=error_message, error_type=RuntimeError)
             return _function(self, *args, **kwargs)
 
         return wrapper
@@ -184,9 +182,8 @@ class StringToIntEncoder:
         if np.any(unknown_mask):
             unknown_values = X[unknown_mask]
 
-            message = f"Found value(s) that are not in the vocabulary:\n\u2192 {unknown_values}"
-            message = format_message(msg=message, msg_type="error")
-            raise ValueError(message)
+            error_message = f"Found value(s) that are not in the vocabulary:\n\u2192 {unknown_values}"
+            display_error(error_message=error_message, error_type=ValueError)
 
     @_decorator_is_model_trained
     def encode(

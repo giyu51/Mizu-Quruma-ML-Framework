@@ -1,12 +1,16 @@
 from typing import Any, Iterable, List, Literal, get_args, Callable, NoReturn, Type
 import numpy as np
-from .message_formatter import format_message
+
+import colorama
+from colorama import Fore, Style
+
+colorama.init()
 
 
 def display_error(
     error_message: str, error_type: Type[Exception] = Exception
 ) -> NoReturn:
-    error_message = format_message(msg=error_message, msg_type="error")
+    error_message = _format_message(msg=error_message, msg_type="error")
     raise error_type(error_message)
 
 
@@ -14,7 +18,7 @@ def display_warning(warning_message: str, print_function=None) -> None:
     if print_function is None:
         print_function = print
 
-    warning_message = format_message(msg=warning_message, msg_type="warning")
+    warning_message = _format_message(msg=warning_message, msg_type="warning")
     print_function(warning_message)
 
 
@@ -22,7 +26,7 @@ def display_info(info_message: str, print_function=None) -> None:
     if print_function is None:
         print_function = print
 
-    info_message = format_message(msg=info_message, msg_type="info")
+    info_message = _format_message(msg=info_message, msg_type="info")
     print_function(info_message)
 
 
@@ -74,27 +78,24 @@ def validate_shapes(
             message = "⚠️ IGNORING: Input array(s) are empty. To raise an error in this case, make sure `ignore_empty_arrays` flag is set to `False`"
             print_function(message)
         else:
-            message = "❌ Input array(s) are empty. All arrays must contain samples. Got:\nArray 1 `shape`: {X.shape}\nArray 2 `shape`: {y.shape}"
-            message = format_message(msg=message, msg_type="error")
-            raise ValueError(message)
+            error_message = "❌ Input array(s) are empty. All arrays must contain samples. Got:\nArray 1 `shape`: {X.shape}\nArray 2 `shape`: {y.shape}"
+            display_error(error_message=error_message, error_type=ValueError)
 
     if metrics == "check_sample_count":
         if X_samples == y_samples:
             message = f"✅ SAMPLE COUNT CHECK Validation is Approved.\nNumber of samples are consistent in both Array 1 and Array 2.\nArray 1 `shape`: {X.shape} \t\u2192 {X_samples} samples\nArray 2 `shape`: {y.shape} \t\u2192 {y_samples} samples"
             print_function(message)
         else:
-            message = f"❌ Inconsistent number of samples between Array 1 and Array 2. Number of samples should be consistent both in Array 1 and Array 2. Got:\nArray 1 `shape`: {X.shape} \t\u2192 {X_samples} samples\nArray 2 `shape`: {y.shape} \t\u2192 {y_samples} samples"
-            message = format_message(msg=message, msg_type="error")
-            raise ValueError(message)
+            error_message = f"❌ Inconsistent number of samples between Array 1 and Array 2. Number of samples should be consistent both in Array 1 and Array 2. Got:\nArray 1 `shape`: {X.shape} \t\u2192 {X_samples} samples\nArray 2 `shape`: {y.shape} \t\u2192 {y_samples} samples"
+            display_error(error_message=error_message, error_type=ValueError)
 
     elif metrics == "check_full_shape":
         if X.shape == y.shape:
             message = f"✅ SAMPLE COUNT CHECK Validation is Approved. Shapes of 2 given arrays are fully consistent:\nArray 1 `shape`: {X.shape}\nArray 2 `shape`: {y.shape}"
             print_function(message)
         else:
-            message = f"❌ Shapes of 2 given arrays are not consistent:\nArray 1 `shape`: {X.shape}\nArray 2 `shape`: {y.shape}"
-            message = format_message(msg=message, msg_type="error")
-            raise ValueError(message)
+            error_message = f"❌ Shapes of 2 given arrays are not consistent:\nArray 1 `shape`: {X.shape}\nArray 2 `shape`: {y.shape}"
+            display_error(error_message=error_message, error_type=ValueError)
 
 
 def noop(*args, **kwargs):
@@ -127,9 +128,9 @@ def validate_types(
             message = f"Variable: {function.__name__}() ARGUMENT \u2192 {variable_name}\nValue Type: {var_type}\nDesired type(s): {desired_type}\nValidation: Approved✅"
             print_function(message)
         else:
-            message = f"Variable: {function.__name__}() ARGUMENT \u2192 {variable_name}\nValue Type: {var_type}\nDesired type(s): {desired_type}\nValidation: Dissaproved❌"
-            message = format_message(msg=message, msg_type="error")
-            raise ValueError(message)
+            error_message = f"Variable: {function.__name__}() ARGUMENT \u2192 {variable_name}\nValue Type: {var_type}\nDesired type(s): {desired_type}\nValidation: Dissaproved❌"
+            display_error(error_message=error_message, error_type=ValueError)
+
     elif isinstance(desired_type, type):
 
         if isinstance(variable, desired_type):
@@ -138,9 +139,9 @@ def validate_types(
             print_function(message)
         else:
 
-            message = f"Variable: {function.__name__}() ARGUMENT \u2192 {variable_name}\nValue Type: {var_type}\nDesired type(s): {desired_type}\nValidation: Dissaproved❌"
-            message = format_message(msg=message, msg_type="error")
-            raise ValueError(message)
+            error_message = f"Variable: {function.__name__}() ARGUMENT \u2192 {variable_name}\nValue Type: {var_type}\nDesired type(s): {desired_type}\nValidation: Dissaproved❌"
+            display_error(error_message=error_message, error_type=ValueError)
+
     else:
         try:
             # Simple Case
@@ -159,13 +160,13 @@ def validate_types(
                     print_function(message)
 
                 else:
-                    message = f"Variable: {function.__name__}() ARGUMENT \u2192 {variable_name}\nValue Type: {var_type}\nDesired type(s): {desired_type}\nValidation: Dissaproved❌"
-                    message = format_message(msg=message, msg_type="error")
-                    raise ValueError(message)
+                    error_message = f"Variable: {function.__name__}() ARGUMENT \u2192 {variable_name}\nValue Type: {var_type}\nDesired type(s): {desired_type}\nValidation: Dissaproved❌"
+                    display_error(error_message=error_message, error_type=ValueError)
+
             except:
-                message = f"Couldn't validate the data type of variable: {function.__name__}() ARGUMENT \u2192 {variable_name}\nValue Type: UNKNOWN 🛑\nDesired type(s): {desired_type}\nValidation: Dissaproved❌"
-                message = format_message(msg=message, msg_type="error")
-                raise ValueError(message)
+                error_message = f"Couldn't validate the data type of variable: {function.__name__}() ARGUMENT \u2192 {variable_name}\nValue Type: UNKNOWN 🛑\nDesired type(s): {desired_type}\nValidation: Dissaproved❌"
+                display_error(error_message=error_message, error_type=ValueError)
+
     print_function("--------------")
 
     # print("_" * 31)
@@ -203,14 +204,12 @@ def to_numpy(_arr: Iterable) -> np.ndarray:
         return numpy_array
 
     except ValueError as ve:
-        message = f"Failed to convert input to numpy array:\n {ve}"
-        message = format_message(msg=message, msg_type="error")
-        raise ValueError(message)
+        error_message = f"Failed to convert input to numpy array:\n {ve}"
+        display_error(error_message=error_message, error_type=ValueError)
 
     except Exception as e:
-        message = f"An unexpected error occurred:\n {e}"
-        message = format_message(msg=message, msg_type="error")
-        raise RuntimeError(message)
+        error_message = f"An unexpected error occurred:\n {e}"
+        display_error(error_message=error_message, error_type=RuntimeError)
 
 
 # def test_validate_types():
@@ -277,3 +276,43 @@ def to_numpy(_arr: Iterable) -> np.ndarray:
 #         validate_shapes(array_1, array_2, metrics, ignore_empty_arrays)
 #     except ValueError as e:
 #         print(e)  # Ensure that it raises a ValueError
+
+
+def _format_message(
+    msg: str, msg_type: Literal["error", "warning", "info"] = "info"
+) -> None:
+    """
+    Display a formatted message with the specified message type.
+
+    Args:
+        msg (str): The message to be displayed.
+        msg_type (Literal["error", "warning", "info"], optional):
+            The type of message. Defaults to "info".
+            Valid options are:
+                - "error": An error message.
+                - "warning": A warning message.
+                - "info": A regular informational message.
+
+    Raises:
+        ValueError: If an unsupported `msg_type` is provided.
+
+    Returns:
+        None
+    """
+    upper_line = "\u2500" * 20
+    small_line = "\u2500" * 1
+    lower_line = "\u2500" * 10
+
+    if msg_type == "info":
+        formatted_message = f"{Fore.GREEN}\n\n{small_line} INFO: {upper_line}\n\n{msg}\n\n{lower_line}\n{Style.RESET_ALL}"
+        return formatted_message
+    elif msg_type == "error":
+        formatted_message = f"{Fore.RED}\n\n{small_line} ERROR: {upper_line}\n\n{msg}\n\n{lower_line}\n{Style.RESET_ALL}"
+        return formatted_message
+    elif msg_type == "warning":
+        formatted_message = f"{Fore.YELLOW}\n\n{small_line} WARNING: {upper_line}\n\n{msg}\n\n{lower_line}\n{Style.RESET_ALL}"
+        return formatted_message
+    else:
+        raise ValueError(
+            f"Invalid msg_type: {msg_type}. Expected one of ['error', 'warning', 'info']"
+        )
