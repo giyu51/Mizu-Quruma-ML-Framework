@@ -7,6 +7,49 @@ from .internal_methods import to_numpy
 
 class StringToIntEncoder:
     def __init__(self) -> None:
+        """
+        Class for encoding and decoding strings to integers.
+
+        ---
+
+        Description 📖:
+        - This class provides methods for encoding and decoding strings to integers, useful for converting categorical variables into numerical format for machine learning models.
+        - After initializing an instance of StringToIntEncoder, you need to fit the encoder to a vocabulary using the `fit()` method before encoding or decoding strings.
+
+        ---
+
+        Parameters ⚒️:
+        - None
+
+        ---
+
+        Returns 📥:
+        - None
+
+        ---
+
+        Raises ⛔:
+        - None
+
+        ---
+
+        Example 🎯:
+        ```
+        # Create an instance of StringToIntEncoder
+        encoder = StringToIntEncoder()
+
+        # Fit the encoder to a vocabulary
+        vocabulary = ['apple', 'banana', 'orange']
+        encoder.fit(vocabulary)
+
+        # Encode and decode strings
+        encoded_array = encoder.encode(['apple', 'banana', 'orange'])
+        decoded_array = encoder.decode(encoded_array)
+
+        print(encoded_array)
+        print(decoded_array)
+        ```
+        """
         self.label_mapping = {}
         self.encoder_is_fit = False
 
@@ -227,7 +270,7 @@ class StringToIntEncoder:
 
         ---
 
-        Example💡:
+        Example 🎯:
             >>> # Save the encoder instance to a file named 'encoder.pkl'
             encoder = StringToIntEncoder()
             encoder.fit(vocabulary)
@@ -260,8 +303,6 @@ class StringToIntEncoder:
 """
 TESTS ARE DONE
 
-Sure! Here's the list with small descriptions for each test case:
-
 1. **Test Basic Fit and Transform**: Fit the encoder with a simple vocabulary and then encode a list of labels to verify the encoding.
    
 2. **Test Encoding Unknown Labels**: Test encoding with labels that were not present in the vocabulary during fitting. Ensure that it handles unknown labels appropriately based on the `replace_unknown` parameter.
@@ -278,5 +319,4 @@ Sure! Here's the list with small descriptions for each test case:
    
 8. **Test Large Dataset**: Test with a large dataset to ensure that it can handle the computation efficiently without running into memory or performance issues.
 
-These descriptions give a brief overview of what each test case is intended to verify or validate in the `StringToIntEncoder` class.
 """

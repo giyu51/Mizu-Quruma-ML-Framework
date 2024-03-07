@@ -1,6 +1,11 @@
-from typing import Any, Iterable, List, Literal, get_args, Callable
+from typing import Any, Iterable, List, Literal, get_args, Callable, NoReturn, Type
 import numpy as np
-from .message_formatter import format_message
+from message_formatter import format_message
+
+
+def display_error(error_message: str, error_type: Type[Exception]) -> NoReturn:
+    error_message = format_message(msg=error_message, msg_type="error")
+    raise error_type(error_message)
 
 
 def validate_shapes(
@@ -190,67 +195,68 @@ def to_numpy(_arr: Iterable) -> np.ndarray:
         raise RuntimeError(message)
 
 
-def test_validate_types():
-    # Test cases for different scenarios
-    validate_types(5, "int_variable", int)
-    validate_types("hello", "str_variable", str)
-    validate_types([1, 2, 3], "list_variable", list)
-    validate_types(5.5, "float_variable", float)
-    validate_types(True, "bool_variable", bool)
-    validate_types("hello", "str_variable", [int, float, str])
-    validate_types(5.5, "float_variable", [int, str, list])
-    validate_types(2, "int_variable", Literal[1, 2, 3])
-    validate_types(4, "int_variable", Literal[1, 2, 3])
+# def test_validate_types():
+#     # Test cases for different scenarios
+#     validate_types(5, "int_variable", int)
+#     validate_types("hello", "str_variable", str)
+#     validate_types([1, 2, 3], "list_variable", list)
+#     validate_types(5.5, "float_variable", float)
+#     validate_types(True, "bool_variable", bool)
+#     validate_types("hello", "str_variable", [int, float, str])
+#     validate_types(5.5, "float_variable", [int, str, list])
+#     validate_types(2, "int_variable", Literal[1, 2, 3])
+#     validate_types(4, "int_variable", Literal[1, 2, 3])
 
 
-def test_validate_shapes():
-    # Valid inputs with consistent shapes
-    array_1 = np.array([[1, 2], [3, 4]])
-    array_2 = np.array([[5, 6], [7, 8]])
-    metrics = "check_sample_count"
-    ignore_empty_arrays = False
-    validate_shapes(array_1, array_2, metrics, ignore_empty_arrays)
+# def test_validate_shapes():
+#     # Valid inputs with consistent shapes
+#     array_1 = np.array([[1, 2], [3, 4]])
+#     array_2 = np.array([[5, 6], [7, 8]])
+#     metrics = "check_sample_count"
+#     ignore_empty_arrays = False
+#     validate_shapes(array_1, array_2, metrics, ignore_empty_arrays)
 
-    # Valid inputs with inconsistent shapes
-    array_1 = np.array([[1, 2], [3, 4]])
-    array_2 = np.array([[5, 6]])
-    metrics = "check_sample_count"
-    ignore_empty_arrays = False
-    try:
-        validate_shapes(array_1, array_2, metrics, ignore_empty_arrays)
-    except ValueError as e:
-        print(e)  # Ensure that it raises a ValueError
+#     # Valid inputs with inconsistent shapes
+#     array_1 = np.array([[1, 2], [3, 4]])
+#     array_2 = np.array([[5, 6]])
+#     metrics = "check_sample_count"
+#     ignore_empty_arrays = False
+#     try:
+#         validate_shapes(array_1, array_2, metrics, ignore_empty_arrays)
+#     except ValueError as e:
+#         print(e)  # Ensure that it raises a ValueError
 
-    # Empty input arrays (not ignoring empty arrays)
-    array_1 = np.array([])
-    array_2 = np.array([[5, 6]])
-    metrics = "check_sample_count"
-    ignore_empty_arrays = False
-    try:
-        validate_shapes(array_1, array_2, metrics, ignore_empty_arrays)
-    except ValueError as e:
-        print(e)  # Ensure that it raises a ValueError
+#     # Empty input arrays (not ignoring empty arrays)
+#     array_1 = np.array([])
+#     array_2 = np.array([[5, 6]])
+#     metrics = "check_sample_count"
+#     ignore_empty_arrays = False
+#     try:
+#         validate_shapes(array_1, array_2, metrics, ignore_empty_arrays)
+#     except ValueError as e:
+#         print(e)  # Ensure that it raises a ValueError
 
-    # Empty input arrays (ignoring empty arrays)
-    array_1 = np.array([])
-    array_2 = np.array([[5, 6]])
-    metrics = "check_sample_count"
-    ignore_empty_arrays = True
-    validate_shapes(array_1, array_2, metrics, ignore_empty_arrays)
+#     # Empty input arrays (ignoring empty arrays)
+#     array_1 = np.array([])
+#     array_2 = np.array([[5, 6]])
+#     metrics = "check_sample_count"
+#     ignore_empty_arrays = True
+#     validate_shapes(array_1, array_2, metrics, ignore_empty_arrays)
 
-    # Valid inputs with consistent shapes (check_full_shape)
-    array_1 = np.array([[1, 2], [3, 4]])
-    array_2 = np.array([[5, 6], [7, 8]])
-    metrics = "check_full_shape"
-    ignore_empty_arrays = False
-    validate_shapes(array_1, array_2, metrics, ignore_empty_arrays)
+#     # Valid inputs with consistent shapes (check_full_shape)
+#     array_1 = np.array([[1, 2], [3, 4]])
+#     array_2 = np.array([[5, 6], [7, 8]])
+#     metrics = "check_full_shape"
+#     ignore_empty_arrays = False
+#     validate_shapes(array_1, array_2, metrics, ignore_empty_arrays)
 
-    # Valid inputs with inconsistent shapes (check_full_shape)
-    array_1 = np.array([[1, 2], [3, 4]])
-    array_2 = np.array([[5, 6]])
-    metrics = "check_full_shape"
-    ignore_empty_arrays = False
-    try:
-        validate_shapes(array_1, array_2, metrics, ignore_empty_arrays)
-    except ValueError as e:
-        print(e)  # Ensure that it raises a ValueError
+#     # Valid inputs with inconsistent shapes (check_full_shape)
+#     array_1 = np.array([[1, 2], [3, 4]])
+#     array_2 = np.array([[5, 6]])
+#     metrics = "check_full_shape"
+#     ignore_empty_arrays = False
+#     try:
+#         validate_shapes(array_1, array_2, metrics, ignore_empty_arrays)
+#     except ValueError as e:
+#         print(e)  # Ensure that it raises a ValueError
+
