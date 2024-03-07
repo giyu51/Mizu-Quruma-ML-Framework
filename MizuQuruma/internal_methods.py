@@ -1,6 +1,6 @@
 from typing import Any, Iterable, List, Literal, get_args, Callable, NoReturn, Type
 import numpy as np
-from message_formatter import format_message
+from .message_formatter import format_message
 
 
 def display_error(error_message: str, error_type: Type[Exception]) -> NoReturn:
