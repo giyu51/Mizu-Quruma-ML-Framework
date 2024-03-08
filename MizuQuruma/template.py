@@ -40,29 +40,15 @@ class KNN:
             function=self.__init__,
         )
 
-        # Handle the case if both `K` and `neighbour_number` provided but the values of them are different.
-        if self.neigbour_number is not None and self.K != self.neigbour_number:
-            error_message = (
-                "`K` and `neighbour_number` attributes must have the same value."
-            )
-            display_error(error_message=error_message, error_type=ValueError)
+        # self.evaluation_metric_names: List[str] = [
+        #     "accuracy",
+        # ]
 
-        self.evaluation_metric_names: List[str] = [
-            "accuracy",
-            "confusion_matrix",
-            "confusion_metrics",
-            "sensitivity",
-            "specificity",
-            "recall",
-            "precision",
-            "f1_score",
-        ]
-
-        self.clfMetrics = ClassificationMetrics
-        self.evaluation_metric_mapping: dict = {
-            name: getattr(self.clfMetrics, "calculate_" + name)
-            for name in self.evaluation_metric_names
-        }
+        # self.clfMetrics = ClassificationMetrics
+        # self.evaluation_metric_mapping: dict = {
+        #     name: getattr(self.clfMetrics, "calculate_" + name)
+        #     for name in self.evaluation_metric_names
+        # }
 
         # Indicate that the model has not been trained yet
         self.model_is_trained: bool = False
@@ -70,9 +56,6 @@ class KNN:
         # Initialization of training data containers
         self.X_train = self.y_train = np.array([])
         self.inputs, self.outputs = self.X_train.view(), self.y_train.view()
-
-        # Initialization of Encoder
-        self.label_encoder = StringToIntEncoder()
 
     def _decorator_is_model_trained(
         _function: Callable[..., Any]
@@ -181,58 +164,20 @@ class KNN:
         if self.verbose > 0:
             display_info(info_message=info_message)
 
+    
+
+    # TO UPDATE
     def show_workflow(self):
 
         workflow = "[ K-Nearest Neighbours Algorithm workflow: ]\n\n1. Initiate the class: Start by creating an instance of the KNN classifier.\n\n2. fit(): Train the model by providing training data using the `fit()` method.\n\n3. evaluate(): Assess the model's performance using evaluation metrics and testing data with the `evaluate()` method.\n\n4. predict(): Optionally, make predictions for new data points using the `predict()` method.\n\n5. plot_data(): Visualize the data, including training and testing points, and decision boundaries if desired, using the `plot_data()` method.\n\n6. save_model() and load_model(): Save the trained model for future use with `save_model()` and load a saved model using `load_model()`."
 
         self._display_info_message(workflow)
 
+    # TO UPDATE
     def fit(self, X_train: np.ndarray, y_train: np.ndarray) -> None:
-        """
-        Fit the KNN classifier to the training data.
-
-        ---
-
-        Description 📖:
-        - This method fits (trains) the KNN classifier to the provided training data.
-        - It validates the shapes and types of the input and output arrays before training the model.
-        - The encoder is updated to remember the whole vocabulary of class labels.
-        - After training, a success message is displayed if the verbosity level is greater than 0.
-
-        ---
-
-        Parameters ⚒️:
-        - `X_train (np.ndarray)`: The input feature array for training.
-        - `y_train (np.ndarray)`: The target output array for training.
-
-        ---
-
-        Returns 📥:
-        - None
-
-        ---
-
-        Raises ⛔:
-        - `ValueError`: If the shapes of `X_train` and `y_train` are incompatible.
-        - `TypeError`: If the types of `X_train` or `y_train` are not iterable.
-
-        ---
-
-        Example 🎯:
-        ```
-        # Create an instance of KNN classifier
-        knn = KNN(K=3, verbose=1)
-
-        # Load training data
-        X_train = np.array([[1, 2], [2, 3], [3, 4]])
-        y_train = np.array([0, 1, 0])
-
-        # Train the classifier
-        knn.fit(X_train, y_train)
-        ```
-        """
 
         self._validate_shapes(X_train, y_train, metrics="check_sample_count")
+
         self._validate_types(
             variable=X_train,
             variable_name="X_train/inputs",
@@ -258,6 +203,7 @@ class KNN:
         info_message = "✅ Model is trained (fitted) succesfully ✅"
         self._display_info_message(info_message)
 
+    # TO UPDATE
     def train_the_model(self, inputs: np.ndarray, outputs: np.ndarray):
         """
         Train the KNN classifier using the provided input and output arrays.
@@ -296,6 +242,7 @@ class KNN:
         """
         return self.fit(X_train=inputs, y_train=outputs)
 
+    # TO UPDATE
     def _encode(self, X: np.ndarray) -> np.ndarray:
         """
         Internally used method to encode class labels.
@@ -373,6 +320,7 @@ class KNN:
         """
         return self.label_encoder.decode(X)
 
+    # TO UPDATE
     @_decorator_is_model_trained
     def evaluate(
         self,
@@ -494,6 +442,7 @@ class KNN:
 
         return evaluation_results
 
+    # TO UPDATE
     @_decorator_is_model_trained
     def test_the_model(self, X_test: np.ndarray, y_test: np.ndarray) -> Dict:
         """
@@ -655,6 +604,7 @@ class KNN:
         return prediction
 
     @_decorator_is_model_trained
+    # TO UPDATE
     def plot_data(
         self,
         X_test=None,
@@ -799,6 +749,7 @@ class KNN:
 
         return plt
 
+    # TO UPDATE
     def generate_dataset(
         # Generates dataset with 2d points (x,y)
         self,
@@ -946,6 +897,7 @@ class KNN:
         """
         return load_instance(filename=filename)
 
+    # TO UPDATE
     def _validate_shapes(
         self,
         array_1: np.ndarray,
@@ -976,6 +928,7 @@ class KNN:
             print_function=print_function,
         )
 
+    # TO UPDATE
     def _validate_types(
         self,
         variable: Any,
@@ -1005,6 +958,7 @@ class KNN:
             print_function=print_function,
         )
 
+    # TO UPDATE
     def _simultaneous_shuffle(
         self, array_1: np.ndarray, array_2: np.ndarray
     ) -> Tuple[np.ndarray, np.ndarray]:
