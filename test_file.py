@@ -1,25 +1,26 @@
-from MizuQuruma.KNearestNeighbours import KNN
 
-model = KNN()
+# from MizuQuruma.KNearestNeighbours import KNN
 
-X_train, y_train, X_test, y_test = model.generate_dataset(n_classes=2)
+# model = KNN()
 
-model.fit(X_train, y_train)
+# X_train, y_train, X_test, y_test = model.generate_dataset(n_classes=2)
 
-prediction = model.predict([[10, 10], [70, 50]])
-print(prediction)
+# model.fit(X_train, y_train)
 
-evaluation = model.evaluate(X_test, y_test)
-print(evaluation)
+# prediction = model.predict([[10, 10], [70, 50]])
+# print(prediction)
 
-model.save_model()
+# evaluation = model.evaluate(X_test, y_test)
+# print(evaluation)
 
-model = model.load_model()
-evaluation = model.evaluate(X_test, y_test)
-print(evaluation)
+# model.save_model()
+
+# model = model.load_model()
+# evaluation = model.evaluate(X_test, y_test)
+# print(evaluation)
 
 
-my_plot = model.plot_data(X_test, y_test)
-my_plot.show()
+# my_plot = model.plot_data(X_test, y_test)
+# my_plot.show()
 
-# ---
+# # ---

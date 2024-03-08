@@ -114,8 +114,6 @@ class KNN:
             )
             display_error(error_message=error_message, error_type=ValueError)
 
-        self.user_guide_data = None
-        self.welcome_message: str | None = None
         self.evaluation_metric_names: List[str] = [
             "accuracy",
             "confusion_matrix",
