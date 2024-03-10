@@ -40,11 +40,17 @@
 # print("Bitcoin Price:", bitcoin_price)
 
 
-from MizuQuruma.Regression import LinearRegression, StochasticLinearRegression
+from MizuQuruma.Regression import StochasticLinearRegression
 from icecream import ic
+import numpy as np
 
-model = LinearRegression()
-X_train, y_train = model.generate_dataset(samples=150)
 
 model = StochasticLinearRegression()
-model.fit(X_train, y_train, num_iterations=55)
+X_train, y_train, X_test, y_test = model.generate_dataset(
+    coeff=[2], intercept=5, n_features=1, n_samples=150
+)
+# ic(X_train)
+# ic(y_train)
+
+model.fit(X_train, y_train, num_iterations=200, verbosity=2)
+# ic(coeff, intercept, loss)
