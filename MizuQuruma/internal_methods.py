@@ -316,3 +316,11 @@ def _format_message(
         raise ValueError(
             f"Invalid msg_type: {msg_type}. Expected one of ['error', 'warning', 'info']"
         )
+
+
+def handle_single_feature(X):
+
+    if X.ndim == 1:
+        X = X.reshape((-1, 1))
+
+    return X

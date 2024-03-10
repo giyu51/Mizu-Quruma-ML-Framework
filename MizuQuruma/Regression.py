@@ -12,6 +12,7 @@ from .internal_methods import (
     display_error,
     display_info,
     display_warning,
+    handle_single_feature,
 )
 
 from .LabelEncoders import StringToIntEncoder
@@ -21,27 +22,82 @@ from .Metrics import ClassificationMetrics
 
 class StochasticLinearRegression:
     def __init__(self):
-        self.learning_rate = 1e-3
-        self.X_train = None
-        self.y_train = None
-        self.num_iterations = None
-        self.verbosity = 1
+        self.X_train: np.ndarray = None
+        self.y_train: np.ndarray = None
+        self.num_iterations: int = 1
+        self.learning_rate: float = 1e-3
+        self.verbosity: int = 1
         self.weights_, self.bias_ = np.random.randn(2)
 
+        # Initializaiton of internal Variables
+        self.model_is_trained = False
+
     def display_info(self, message, min_verbosity=0):
+        # Shows message based on minimal verbosity level set in the flag
         if self.verbosity >= min_verbosity:
             print(message)
 
     def fit(
-        self, X_train, y_train, num_iterations=100, learning_rate=1e-3, verbosity=1
-    ):
-        self.X_train = X_train
-        self.y_train = y_train
+        self,
+        X_train: np.ndarray,
+        y_train: np.ndarray,
+        num_iterations: int = 100,
+        learning_rate: int | float = 1e-3,
+        verbosity: int = 1,
+    ) -> Tuple[float, np.ndarray, np.ndarray]:
+
+        # Validate types of passed arguments
+
+        validate_types(
+            variable=X_train,
+            variable_name="X_train",
+            desired_type=Iterable,
+            function=self.fit,
+        )
+
+        validate_types(
+            variable=y_train,
+            variable_name="y_train",
+            desired_type=Iterable,
+            function=self.fit,
+        )
+
+        validate_types(
+            variable=num_iterations,
+            variable_name="num_iterations",
+            desired_type=int,
+            function=self.fit,
+        )
+
+        validate_types(
+            variable=learning_rate,
+            variable_name="learning_rate",
+            desired_type=[int, float],
+            function=self.fit,
+        )
+
+        validate_types(
+            variable=verbosity,
+            variable_name="verbosity",
+            desired_type=int,
+            function=self.fit,
+        )
+
+        # Ensure training data is in numpy format for integrity
+        self.X_train = to_numpy(X_train)
+        self.y_train = to_numpy(y_train)
+
+        # If the shape of X_train is (n_samples, )
+        # it will turn it to (n_samples, 1) which will correspond to
+        # format (n_samples, n_features)
+
+        self.X_train = handle_single_feature(self.X_train)
+
         self.num_iterations = num_iterations
         self.learning_rate = learning_rate
         self.verbosity = verbosity
 
-        for iter_count in range(num_iterations):
+        for iter_count in range(self.num_iterations):
             self.loss_ = self.evaluate(self.X_train, self.y_train)
             self.display_info(
                 message=f"Iteration {iter_count}\tLoss: {self.loss_}",
@@ -56,7 +112,11 @@ class StochasticLinearRegression:
                 self.weights_ -= weight_gradients * self.learning_rate
                 self.bias_ -= bias_gradient * self.learning_rate
 
-        self.display_info(message=f"\nWeights: {self.weights_}\nBias: {self.bias_}")
+        self.model_is_trained = True
+
+        self.display_info(
+            message=f"Loss{self.loss_}\nWeights: {self.weights_}\nBias: {self.bias_}"
+        )
         # self.display_info(f"Model is trained.\nFinal Loss:{self.loss_}", min_verbosity=1)
         return self.loss_, self.weights_, self.bias_
 
@@ -68,13 +128,9 @@ class StochasticLinearRegression:
         y_pred = self.predict(X)
         return np.mean(np.abs(y - y_pred))
 
-    def evaluate(self, X, y):
+    def evaluate(self, X, y, evaluation_metric: Literal["mse", "mae"] = "mse"):
+        self.evaluation_metric = evaluation_metric_names.get(evaluation_metric)
         return self._mse(X, y)
-
-    def validate_feature_format(self, X: np.ndarray) -> np.ndarray:
-        if X.ndim == 1:
-            X = X.reshape((-1, 1))
-        return X
 
     def _calculate_gradients(self, xi: np.ndarray, yi: np.ndarray):
         y_pred = self.predict(xi)
@@ -100,10 +156,7 @@ class StochasticLinearRegression:
         return weight_gradients, bias_gradient
 
     def predict(self, X):
-        return self._get_linear_combination(X=X, weights=self.weights_, bias=self.bias_)
-
-    def _get_linear_combination(self, X, weights, bias):
-        return X * weights + bias
+        return X * self.weights_ + self.bias_
 
     def generate_dataset(
         self,
