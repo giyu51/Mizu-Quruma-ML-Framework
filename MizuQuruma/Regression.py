@@ -45,6 +45,10 @@ class StochasticLinearRegression:
         learning_rate: int | float = 1e-3,
         verbosity: int = 1,
     ) -> Tuple[float, np.ndarray, np.ndarray]:
+        #
+        #
+        #   """" ADJUST INFORMATION OUTPUT"""
+        #
 
         # Validate types of passed arguments
 
@@ -98,11 +102,6 @@ class StochasticLinearRegression:
         self.verbosity = verbosity
 
         for iter_count in range(self.num_iterations):
-            self.loss_ = self.evaluate(self.X_train, self.y_train)
-            self.display_info(
-                message=f"Iteration {iter_count}\tLoss: {self.loss_}",
-                min_verbosity=2,
-            )
             for xi, yi in zip(self.X_train, self.y_train):
                 # ic(xi)
                 # ic(yi)
@@ -112,11 +111,23 @@ class StochasticLinearRegression:
                 self.weights_ -= weight_gradients * self.learning_rate
                 self.bias_ -= bias_gradient * self.learning_rate
 
+            self.loss_ = self.evaluate(self.X_train, self.y_train)
+
+            info_message = f"Iteration {iter_count}\tLoss: {self.loss_}"
+            self.display_info(
+                message=info_message,
+                min_verbosity=2,
+            )
+
         self.model_is_trained = True
+        info_message = "Training is finished succesfully!"
+        display_info(info_message=info_message)
 
         self.display_info(
-            message=f"Loss{self.loss_}\nWeights: {self.weights_}\nBias: {self.bias_}"
+            message=f"Loss{self.loss_}\nWeights: {self.weights_}\nBias: {self.bias_}",
+            min_verbosity=1,
         )
+
         # self.display_info(f"Model is trained.\nFinal Loss:{self.loss_}", min_verbosity=1)
         return self.loss_, self.weights_, self.bias_
 
