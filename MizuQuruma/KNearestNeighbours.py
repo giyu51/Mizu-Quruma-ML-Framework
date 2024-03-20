@@ -751,15 +751,18 @@ class KNN:
         k_indexes = np.argsort(distances)[: self.K]
 
         k_labels = self.y_train[k_indexes]
+        print(k_labels)
+        if not self.regression_mode:
 
-        k_labels = self._encode(k_labels)
+            k_labels = self._encode(k_labels)
 
-        label_count = np.bincount(k_labels)
-        common_label = np.argmax(label_count)
+            label_count = np.bincount(k_labels)
+            common_label = np.argmax(label_count)
 
-        prediction = common_label
-
-        prediction = self._decode(common_label.flatten())[0]
+            prediction = common_label
+            prediction = self._decode(common_label.flatten())[0]
+        else:
+            prediction = np.mean(k_labels)
 
         return prediction
 
@@ -971,7 +974,7 @@ class KNN:
     def generate_dataset(
         # Generates dataset with 2d points (x,y)
         self,
-        samples=15,
+        n_samples=15,
         n_classes: int = 3,
     ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         """
@@ -1008,40 +1011,51 @@ class KNN:
         ```
         """
 
-        X_train = np.concatenate(
-            (
-                [
-                    np.random.randint(
-                        low=1 * (i * 50),
-                        high=50 * (i + 1),
-                        size=(samples // n_classes, 2),
-                    )
-                    for i in range(n_classes)
-                ]
-            )
-        )
-        X_test = np.concatenate(
-            (
-                [
-                    np.random.randint(
-                        low=1 * (i * 50),
-                        high=50 * (i + 1),
-                        size=(samples // n_classes, 2),
-                    )
-                    for i in range(n_classes)
-                ]
-            )
-        )
+        if not self.regression_mode:
 
-        y_train = y_test = np.concatenate(
-            (
-                [
-                    np.repeat("MyClass_" + str(i), samples // n_classes)
-                    for i in range(n_classes)
-                ]
-            ),
-        )
+            X_train = np.concatenate(
+                (
+                    [
+                        np.random.randint(
+                            low=1 * (i * 50),
+                            high=50 * (i + 1),
+                            size=(n_samples // n_classes, 2),
+                        )
+                        for i in range(n_classes)
+                    ]
+                )
+            )
+            X_test = np.concatenate(
+                (
+                    [
+                        np.random.randint(
+                            low=1 * (i * 50),
+                            high=50 * (i + 1),
+                            size=(n_samples // n_classes, 2),
+                        )
+                        for i in range(n_classes)
+                    ]
+                )
+            )
 
+            y_train = y_test = np.concatenate(
+                (
+                    [
+                        np.repeat("MyClass_" + str(i), n_samples // n_classes)
+                        for i in range(n_classes)
+                    ]
+                ),
+            )
+        else:
+            k, b = np.random.randint(low=1, high=15, size=(2,))
+            print(k, b)
+            X_train = np.random.randint(low=1, high=100, size=(n_samples,))
+            X_test = np.random.randint(low=1, high=100, size=(n_samples,))
+
+            y_train = X_train * k + b
+            y_test = X_test * k + b
+        X_train = X_train.reshape((-1, 1))
+        X_test = X_test.reshape((-1, 1))
         X_train, y_train = self._simultaneous_shuffle(X_train, y_train)
         X_test, y_test = self._simultaneous_shuffle(X_test, y_test)
 
