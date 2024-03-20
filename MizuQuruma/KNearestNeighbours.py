@@ -26,6 +26,7 @@ class KNN:
         K: int = 2,
         neighbour_number: int | None = None,
         verbose: Literal[0, 1, 2] = 1,
+        regression_mode: bool = False,
         # 0: No output except for critical errors.
         # 1: Standard output.
         # 2: Output including validation checks.
@@ -36,9 +37,10 @@ class KNN:
         ---
 
         Description 📖:
-        - This class implements the K-Nearest Neighbors algorithm for classification. It allows the user to specify the number of neighbors (K) to consider when making predictions.
-        - The algorithm assigns a class label to a data point based on the majority class among its K nearest neighbors in the feature space.
-        - Various evaluation metrics can be calculated to assess the performance of the classifier.
+        - This class implements the K-Nearest Neighbors algorithm for classification or regression.
+        - If `regression_mode` is set to True, the algorithm performs regression instead of classification.
+        - For regression mode, it predicts the target value for a data point based on the average (or weighted average) of the target values of its K nearest neighbors.
+        - Various evaluation metrics can be calculated to assess the performance of the classifier/regressor.
 
         ---
 
@@ -49,6 +51,7 @@ class KNN:
         - 0: No output except for critical errors.
         - 1: Standard output.
         - 2: Output including validation checks.
+        - `regression_mode (bool)`: Flag to indicate whether the algorithm should operate in regression mode. Default is False, indicating classification mode.
 
         ---
 
@@ -65,7 +68,7 @@ class KNN:
         Example 🎯:
         ```
         # Create an instance of KNN classifier
-        knn = KNN(K=3, verbose=1)
+        knn = KNN(K=3, verbose=1, regression_mode=False)
 
         # Load training data
         X_train = np.array([[1, 2], [2, 3], [3, 4]])
@@ -81,12 +84,11 @@ class KNN:
         print(predictions)
         ```
         """
-
         # Initialization of variables
         self.K: int = K
         self.verbose: Literal[0, 1, 2] = verbose
         self.neigbour_number: int | None = neighbour_number
-
+        self.regression_mode: bool = regression_mode
         # Validation of Variable Types
 
         self._validate_types(
@@ -104,6 +106,13 @@ class KNN:
             variable=verbose,
             variable_name="verbose",
             desired_type=Literal[0, 1, 2],
+            function=self.__init__,
+        )
+
+        self._validate_types(
+            variable=regression_mode,
+            variable_name="regression_mode",
+            desired_type=bool,
             function=self.__init__,
         )
 
@@ -249,6 +258,39 @@ class KNN:
             display_info(info_message=info_message)
 
     def show_workflow(self):
+        """
+        Display the step-by-step workflow of using the K-Nearest Neighbours Algorithm.
+
+        ---
+
+        Description 📖:
+        - This method provides a brief overview of the typical workflow involved in using the KNN classifier.
+        - It outlines the main steps required from initiating the class to saving and loading the trained model.
+
+        ---
+
+        Parameters ⚒️:
+        - None
+
+        ---
+
+        Returns 📥:
+        - None
+
+        ---
+
+        Raises ⛔:
+        - None
+
+        ---
+
+        Example 🎯:
+        ```
+        # Display the workflow
+        knn.show_workflow()
+        ```
+
+        """
 
         workflow = "[ K-Nearest Neighbours Algorithm workflow: ]\n\n1. Initiate the class: Start by creating an instance of the KNN classifier.\n\n2. fit(): Train the model by providing training data using the `fit()` method.\n\n3. evaluate(): Assess the model's performance using evaluation metrics and testing data with the `evaluate()` method.\n\n4. predict(): Optionally, make predictions for new data points using the `predict()` method.\n\n5. plot_data(): Visualize the data, including training and testing points, and decision boundaries if desired, using the `plot_data()` method.\n\n6. save_model() and load_model(): Save the trained model for future use with `save_model()` and load a saved model using `load_model()`."
 
