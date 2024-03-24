@@ -10,7 +10,7 @@ from .internal_methods import (
     to_numpy,
     simultaneous_shuffle,
     display_error,
-    display_info,
+    _display_info,
     display_warning,
     handle_single_feature,
 )
@@ -89,7 +89,7 @@ class LinearRegression:
 
         return wrapper
 
-    def display_info(self, message, min_verbosity=0):
+    def _display_info(self, message, min_verbosity=0):
         # Shows message based on minimal verbosity level set in the flag
         if self.verbosity >= min_verbosity:
             print(message)
@@ -100,8 +100,52 @@ class LinearRegression:
         y_train: np.ndarray,
         num_iterations: int = 100,
         learning_rate: int | float = 1e-3,
-        verbosity: int = 1,
+        verbosity: Literal[0, 1, 2] = 1,
     ) -> Tuple[float, np.ndarray, np.ndarray]:
+        """
+
+        Fit the linear regression model to the training data.
+
+        ---
+
+        Description 📖:
+
+        - This method fits the linear regression model to the provided training data using gradient descent optimization.
+        It updates the model's weights and bias iteratively based on the calculated gradients until convergence or the specified number of iterations is reached.
+
+        ---
+
+        Parameters ⚒️:
+
+        - `X_train` (np.ndarray): The feature matrix of shape (n_samples, n_features) containing the training data.
+        - `y_train` (np.ndarray): The target values of shape (n_samples,) corresponding to the training data.
+        - `num_iterations` (int): The number of iterations for which the gradient descent optimization will run. Defaults to 100.
+        - `learning_rate` (int | float): The learning rate determining the step size in each iteration of gradient descent. Defaults to 1e-3.
+        - `verbosity` (Literal[0,1,2]): Verbosity level controlling the amount of information displayed during training.
+        - 0: No information displayed.
+        - 1: Displays loss information after each iteration.
+        - 2: Displays detailed information including iteration number and loss after each iteration. Defaults to 1.
+
+        ---
+
+        Returns 📤:
+
+        - Tuple[float, np.ndarray, np.ndarray]: A tuple containing the final loss value, optimized weights, and bias of the linear regression model.
+
+        ---
+
+        Example 🎯:
+
+        ```python
+        import numpy as np
+        from your_module import YourLinearRegressionModel
+
+        # Assuming X_train and y_train are the training data
+        model = YourLinearRegressionModel()
+        loss, weights, bias = model.fit(X_train, y_train)
+        ```
+
+        """
 
         validate_types(
             variable=X_train,
@@ -162,21 +206,21 @@ class LinearRegression:
             self.loss_ = self.evaluate(self.X_train, self.y_train)
 
             info_message = f"Iteration {iter_count}\tLoss: {self.loss_}"
-            self.display_info(
+            self._display_info(
                 message=info_message,
                 min_verbosity=2,
             )
 
         self.model_is_trained = True
         info_message = "Training is finished succesfully!"
-        display_info(info_message=info_message)
+        _display_info(info_message=info_message)
 
-        self.display_info(
+        self._display_info(
             message=f"Loss: {self.loss_}\nWeights: {self.weights_}\nBias: {self.bias_}",
             min_verbosity=1,
         )
 
-        # self.display_info(f"Model is trained.\nFinal Loss:{self.loss_}", min_verbosity=1)
+        # self._display_info(f"Model is trained.\nFinal Loss:{self.loss_}", min_verbosity=1)
         return self.loss_, self.weights_, self.bias_
 
     def evaluate(
@@ -185,6 +229,47 @@ class LinearRegression:
         y_test: np.ndarray,
         evaluation_metric: Literal["mse", "mae"] = "mse",
     ):
+        """
+
+        Evaluate the linear regression model on the test data using specified evaluation metric.
+
+        ---
+
+        Description 📖:
+
+        - This method evaluates the performance of the linear regression model on the provided test data by comparing the predicted values with the actual target values.
+        It calculates the evaluation metric specified by the user, such as Mean Squared Error (MSE) or Mean Absolute Error (MAE).
+
+        ---
+
+        Parameters ⚒️:
+
+        - `X_test` (np.ndarray): The feature matrix of shape (n_samples, n_features) containing the test data.
+        - `y_test` (np.ndarray): The target values of shape (n_samples,) corresponding to the test data.
+        - `evaluation_metric` (Literal["mse", "mae"]): The evaluation metric used to assess the model's performance.
+        - "mse": Mean Squared Error.
+        - "mae": Mean Absolute Error. Defaults to "mse".
+
+        ---
+
+        Returns 📤:
+
+        - float: The evaluation score indicating the performance of the model on the test data.
+
+        ---
+
+        Example 🎯:
+
+        ```python
+        import numpy as np
+        from your_module import YourLinearRegressionModel
+
+        # Assuming X_test and y_test are the test data
+        model = YourLinearRegressionModel()
+        evaluation_score = model.evaluate(X_test, y_test, evaluation_metric="mse")
+        ```
+
+        """
 
         y_pred = self.predict(X_test)
         y_real = y_test
@@ -216,6 +301,44 @@ class LinearRegression:
         return weight_gradients, bias_gradient
 
     def predict(self, X):
+        """
+
+        Predict target values using the trained linear regression model.
+
+        ---
+
+        Description 📖:
+
+        - This method predicts the target values using the trained linear regression model based on the provided feature matrix.
+            It utilizes the learned weights and bias of the model to make predictions.
+
+        ---
+
+        Parameters ⚒️:
+
+        - `X` (np.ndarray): The feature matrix of shape (n_samples, n_features) for which predictions are to be made.
+
+        ---
+
+        Returns 📤:
+
+        - np.ndarray: An array containing the predicted target values.
+
+        ---
+
+        Example 🎯:
+
+        ```python
+        import numpy as np
+        from your_module import YourLinearRegressionModel
+
+        # Assuming X_test is the feature matrix for prediction
+        model = YourLinearRegressionModel()
+        y_pred = model.predict(X_test)
+        ```
+
+        """
+
         return X * self.weights_ + self.bias_
 
     def generate_dataset(
@@ -225,6 +348,45 @@ class LinearRegression:
         coeff: Iterable[float | int] | None = None,
         intercept: float | None = None,
     ):
+        """
+
+        Generate a synthetic dataset for regression.
+
+        ---
+
+        Description 📖:
+
+        - This method generates a synthetic dataset for regression tasks with specified features, samples, coefficients, and intercept.
+        It randomly generates coefficients and intercept if not provided, and then generates feature and target arrays based on these parameters.
+
+        ---
+
+        Parameters ⚒️:
+        
+        - `n_features` (int): The number of features to generate. Defaults to 1.
+        - `n_samples` (int): The number of samples to generate. Defaults to 10.
+        - `coeff` (Iterable[float | int] | None): The coefficients to use for generating target values. If None, random coefficients are generated. Defaults to None.
+        - `intercept` (float | None): The intercept to use for generating target values. If None, a random intercept is generated. Defaults to None.
+
+        ---
+
+        Returns 📤:
+
+        - Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]: A tuple containing the generated training feature matrix, training target values, testing feature matrix, and testing target values.
+
+        ---
+
+        Example 🎯:
+
+        ```python
+        import numpy as np
+        from your_module import YourLinearRegressionModel
+
+        # Assuming model is an instance of YourLinearRegressionModel
+        X_train, y_train, X_test, y_test = model.generate_dataset(n_features=3, n_samples=100)
+        ```
+
+        """
 
         if coeff is None:
             coeff = np.random.rand(n_features) * np.random.randint(1, 10)
@@ -245,8 +407,8 @@ class LinearRegression:
         X_train, y_train = simultaneous_shuffle(X_train, y_train)
         X_test, y_test = simultaneous_shuffle(X_test, y_test)
 
-        self.display_info(f"Generated Weights: {coeff}", min_verbosity=1)
-        self.display_info(f"Generated Bias: {intercept}", min_verbosity=1)
+        self._display_info(f"Generated Weights: {coeff}", min_verbosity=1)
+        self._display_info(f"Generated Bias: {intercept}", min_verbosity=1)
         return X_train, y_train, X_test, y_test
 
     @_decorator_is_model_trained
