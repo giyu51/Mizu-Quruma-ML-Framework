@@ -567,6 +567,9 @@ class KNN:
             error_message = f"Choose correct metric names.\nGot: {metrics}.\nExpected: One of {self.evaluation_metric_names}"
             display_error(error_message=error_message, error_type=ArgumentError)
 
+        if self.regression_mode:
+            metrics = ["accuracy"]
+
         self._validate_shapes(X_test, y_test, metrics="check_sample_count")
         self._validate_types(
             variable=X_test,
