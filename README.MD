@@ -44,6 +44,7 @@ Embark on your journey into the world of Machine Learning with **Mizu Quruma** â
 ðŸ“Š **Introducing the Added Module**
 
 1. KNearestNeighbours 03/06/2024
+2. Linear Regression 03/24/2024
 
 
 ---
