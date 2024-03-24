@@ -94,6 +94,7 @@ class LinearRegression:
         if self.verbosity >= min_verbosity:
             print(message)
 
+    @_decorator_is_model_trained
     def fit(
         self,
         X_train: np.ndarray,
@@ -223,6 +224,7 @@ class LinearRegression:
         # self._display_info(f"Model is trained.\nFinal Loss:{self.loss_}", min_verbosity=1)
         return self.loss_, self.weights_, self.bias_
 
+    @_decorator_is_model_trained
     def evaluate(
         self,
         X_test: np.ndarray,
@@ -280,7 +282,6 @@ class LinearRegression:
         return 1 - eval_function(evaluation_calculator)
 
     def _calculate_gradients(self, xi: np.ndarray, yi: np.ndarray):
-        y_pred = self.predict(xi)
 
         # dy/dw1 = -2 * (y - (X1 * w1 + X2 * w2 + b)) * (W1)
         # dy/dw2 = -2 * (y - (X1 * w1 + X2 * w2 + b)) * (W2)
@@ -300,6 +301,7 @@ class LinearRegression:
 
         return weight_gradients, bias_gradient
 
+    @_decorator_is_model_trained
     def predict(self, X):
         """
 
@@ -362,7 +364,7 @@ class LinearRegression:
         ---
 
         Parameters ⚒️:
-        
+
         - `n_features` (int): The number of features to generate. Defaults to 1.
         - `n_samples` (int): The number of samples to generate. Defaults to 10.
         - `coeff` (Iterable[float | int] | None): The coefficients to use for generating target values. If None, random coefficients are generated. Defaults to None.
@@ -419,3 +421,27 @@ class LinearRegression:
     def load_model(self, filename="KNN_model.pkl") -> Any:
 
         return load_instance(filename=filename)
+
+
+class LogisticRegression:
+    def __init__(self) -> None:
+        pass
+
+    def predict(self, X: np.ndarray):
+        prediction = X * self.wights + self.bias
+        mapped_prediction = self.sigmoid_function(prediction)
+
+        return mapped_prediction
+
+    def _sigmoid_function(self, x):
+        result = 1 / (1 + np.e ^ (-x))
+        return result
+
+    def _calculate_gradients(self, xi: np.ndarray, yi: np.ndarray):
+        y_pred = self.predict(xi)  # (n_sample, n_feautures)
+        weight_gradients = -2 * (yi - y_pred) * xi
+
+        bias_gradient = -2 * (yi - y_pred)
+        # don't multiply by anything because differentiation of a constant results in 1.
+
+        return weight_gradients, bias_gradient
