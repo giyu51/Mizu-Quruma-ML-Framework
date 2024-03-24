@@ -15,8 +15,8 @@ model.fit(X_train, y_train)
 prediction = model.predict(X_test)
 print(prediction)
 # 
-# evaluation = model.evaluate(X_test, y_test)
-# print(evaluation)
+evaluation = model.evaluate(X_test, y_test)
+print(evaluation)
 
 # model.save_model()
 
