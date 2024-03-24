@@ -1,12 +1,12 @@
 import numpy as np
 from typing import Iterable, Tuple
-from .internal_methods import display_error
+from .internal_methods import display_error, to_numpy
 
 
 class ClassificationMetrics:
     def __init__(self, y_real: np.ndarray, y_pred: np.ndarray) -> None:
-        self.y_real = self.to_numpy(y_real)
-        self.y_pred = self.to_numpy(y_pred)
+        self.y_real = to_numpy(y_real)
+        self.y_pred = to_numpy(y_pred)
 
         self.confusion_matrix = self.calculate_confusion_matrix()
         self.tp, self.fp, self.fn, self.tn = self.calculate_confusion_metrics().values()
@@ -24,8 +24,8 @@ class ClassificationMetrics:
             y_real = self.y_real
             y_pred = self.y_pred
         else:
-            y_pred = self.to_numpy(y_pred)
-            y_real = self.to_numpy(y_real)
+            y_pred = to_numpy(y_pred)
+            y_real = to_numpy(y_real)
 
         accuracy = np.mean(y_pred == y_real)
 
@@ -39,8 +39,8 @@ class ClassificationMetrics:
             y_real = self.y_real
             y_pred = self.y_pred
         else:
-            y_pred = self.to_numpy(y_pred)
-            y_real = self.to_numpy(y_real)
+            y_pred = to_numpy(y_pred)
+            y_real = to_numpy(y_real)
 
         unique_labels = np.unique(np.concatenate((y_real, y_pred)))
         confusion_matrix = np.zeros(
@@ -63,7 +63,7 @@ class ClassificationMetrics:
         if confusion_matrix is None:
             confusion_matrix = self.confusion_matrix
         else:
-            confusion_matrix = self.to_numpy(confusion_matrix)
+            confusion_matrix = to_numpy(confusion_matrix)
 
         tp = np.diag(confusion_matrix)
         fp = np.sum(confusion_matrix, axis=0) - tp
@@ -85,8 +85,8 @@ class ClassificationMetrics:
             tp = self.tp
             fn = self.fn
         else:
-            tp = self.to_numpy(tp)
-            fn = self.to_numpy(fn)
+            tp = to_numpy(tp)
+            fn = to_numpy(fn)
 
         if np.any(tp < 0) or np.any(fn < 0):
             error_message = "The number of true positives (tp) and false negatives (fn) must be non-negative."
@@ -113,8 +113,8 @@ class ClassificationMetrics:
             tp = self.tp
             fp = self.fp
         else:
-            tp = self.to_numpy(tp)
-            fp = self.to_numpy(fp)
+            tp = to_numpy(tp)
+            fp = to_numpy(fp)
 
         if np.any(tp < 0) or np.any(fp < 0):
             error_message = "The number of true positives (tp) and false positives (fp) must be non-negative."
@@ -131,9 +131,9 @@ class ClassificationMetrics:
             fp = self.fp
             fn = self.fn
         else:
-            tp = self.to_numpy(tp)
-            fp = self.to_numpy(fp)
-            fn = self.to_numpy(fn)
+            tp = to_numpy(tp)
+            fp = to_numpy(fp)
+            fn = to_numpy(fn)
 
         if np.any(tp < 0) or np.any(fp < 0) or np.any(fn < 0):
             error_message = "The number of true positives (tp), false positives (fp), and false negatives (fn) must be non-negative."
@@ -152,8 +152,8 @@ class ClassificationMetrics:
             tn = self.tn
             fp = self.fp
         else:
-            tn = self.to_numpy(tn)
-            fp = self.to_numpy(fp)
+            tn = to_numpy(tn)
+            fp = to_numpy(fp)
 
         if np.any(tn < 0) or np.any(fp < 0):
 
@@ -181,3 +181,29 @@ class ClassificationMetrics:
 
     def get_confusion_metrics(self):
         return self.confusion_metrics
+
+
+class RegressionMetrics:
+    def __init__(self, y_real, y_pred) -> None:
+        self.y_real = to_numpy(y_real)
+        self.y_pred = to_numpy(y_pred)
+
+    def calculate_mse(self, y_real=None, y_pred=None):
+        if y_real is None or y_pred is None:
+            y_real = self.y_real
+            y_pred = self.y_pred
+        error_rate = np.mean(np.square(y_real - y_pred))
+        return error_rate
+
+    def calculate_mae(self, y_real=None, y_pred=None):
+        if y_real is None or y_pred is None:
+            y_real = self.y_real
+            y_pred = self.y_pred
+        error_rate = np.mean(np.abs(y_real - y_pred))
+        return error_rate
+
+    def calculate_mean_squared_error(self):
+        return self.mse()
+
+    def calculate_mean_absolute_error(self):
+        return self.mae()

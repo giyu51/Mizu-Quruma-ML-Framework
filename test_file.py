@@ -1,22 +1,22 @@
-from MizuQuruma.KNearestNeighbours import KNN
-import numpy as np
-from icecream import ic
+# from MizuQuruma.KNearestNeighbours import KNN
+# import numpy as np
+# from icecream import ic
 
 
-model = KNN(regression_mode=True)
+# model = KNN(regression_mode=True)
 
-X_train, y_train, X_test, y_test = model.generate_dataset(n_samples=200)
-
-
-model.fit(X_train, y_train)
+# X_train, y_train, X_test, y_test = model.generate_dataset(n_samples=200)
 
 
+# model.fit(X_train, y_train)
 
-prediction = model.predict(X_test)
-print(prediction)
-# 
-evaluation = model.evaluate(X_test, y_test)
-print(evaluation)
+
+
+# prediction = model.predict(X_test)
+# print(prediction)
+# # 
+# evaluation = model.evaluate(X_test, y_test)
+# print(evaluation)
 
 # model.save_model()
 
@@ -46,17 +46,19 @@ print(evaluation)
 # print("Bitcoin Price:", bitcoin_price)
 
 
-# from MizuQuruma.Regression import StochasticLinearRegression
-# from icecream import ic
-# import numpy as np
+from MizuQuruma.Regression import LinearRegression
+from icecream import ic
+import numpy as np
 
 
-# model = StochasticLinearRegression()
-# X_train, y_train, X_test, y_test = model.generate_dataset(
-#     coeff=[2], intercept=5, n_features=1, n_samples=150
-# )
-# # ic(X_train)
-# # ic(y_train)
+model = LinearRegression()
+X_train, y_train, X_test, y_test = model.generate_dataset(
+    coeff=[2], intercept=5, n_features=1, n_samples=15
+)
+ic(X_train)
+ic(y_train)
 
-# model.fit(X_train, y_train, num_iterations=200, verbosity=2)
-# # ic(coeff, intercept, loss)
+model.fit(X_train, y_train, num_iterations=200, verbosity=1)
+evaluation = model.evaluate(X_test, y_test, evaluation_metric="mse")
+print(evaluation)
+# ic(coeff, intercept, loss)

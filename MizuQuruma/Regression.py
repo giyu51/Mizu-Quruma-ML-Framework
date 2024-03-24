@@ -15,12 +15,11 @@ from .internal_methods import (
     handle_single_feature,
 )
 
-from .LabelEncoders import StringToIntEncoder
 from .model_selection import save_instance, load_instance
-from .Metrics import ClassificationMetrics
+from .Metrics import RegressionMetrics
 
 
-class StochasticLinearRegression:
+class LinearRegression:
     def __init__(self):
         self.X_train: np.ndarray = None
         self.y_train: np.ndarray = None
@@ -31,6 +30,64 @@ class StochasticLinearRegression:
 
         # Initializaiton of internal Variables
         self.model_is_trained = False
+
+        self.evaluation_metric_names = [
+            "mse",
+            "mae",
+            "mean_squared_error",
+            "mean_absolute_error",
+        ]
+        self.evaluation_metrics = RegressionMetrics
+        self.evaluation_metric_mapping: dict = {
+            name: getattr(self.evaluation_metrics, "calculate_" + name)
+            for name in self.evaluation_metric_names
+        }
+
+    def _decorator_is_model_trained(
+        _function: Callable[..., Any]
+    ) -> Callable[..., Any]:
+        """
+        Decorator to check if the model is trained before executing a method.
+
+        ---
+
+        Description 📖:
+        - This decorator checks whether the model has been trained using the `fit()` method before executing the decorated method.
+        - If the model has not been trained, it raises a `RuntimeError` with an appropriate error message.
+
+        ---
+
+        Parameters ⚒️:
+        - `_function (Callable[..., Any])`: The function to be decorated.
+
+        ---
+
+        Returns 📥:
+            - `callable`: The wrapper function.
+
+        ---
+
+        Raises ⛔:
+        - `RuntimeError`: If the model is not trained when calling the decorated function.
+
+        ---
+
+        Example 🎯:
+        ```
+        @_decorator_is_model_trained
+        def predict(self, X: np.ndarray) -> np.ndarray:
+            # Method implementation
+        ```
+        """
+
+        def wrapper(self, *args, **kwargs):
+            if not self.model_is_trained:
+                error_message = f"First, train the model using the `fit()` method before using the `{_function.__name__}()` method."
+                display_error(error_message=error_message, error_type=RuntimeError)
+
+            return _function(self, *args, **kwargs)
+
+        return wrapper
 
     def display_info(self, message, min_verbosity=0):
         # Shows message based on minimal verbosity level set in the flag
@@ -45,12 +102,6 @@ class StochasticLinearRegression:
         learning_rate: int | float = 1e-3,
         verbosity: int = 1,
     ) -> Tuple[float, np.ndarray, np.ndarray]:
-        #
-        #
-        #   """" ADJUST INFORMATION OUTPUT"""
-        #
-
-        # Validate types of passed arguments
 
         validate_types(
             variable=X_train,
@@ -103,9 +154,6 @@ class StochasticLinearRegression:
 
         for iter_count in range(self.num_iterations):
             for xi, yi in zip(self.X_train, self.y_train):
-                # ic(xi)
-                # ic(yi)
-                # ic("_")
                 weight_gradients, bias_gradient = self._calculate_gradients(xi, yi)
 
                 self.weights_ -= weight_gradients * self.learning_rate
@@ -124,24 +172,27 @@ class StochasticLinearRegression:
         display_info(info_message=info_message)
 
         self.display_info(
-            message=f"Loss{self.loss_}\nWeights: {self.weights_}\nBias: {self.bias_}",
+            message=f"Loss: {self.loss_}\nWeights: {self.weights_}\nBias: {self.bias_}",
             min_verbosity=1,
         )
 
         # self.display_info(f"Model is trained.\nFinal Loss:{self.loss_}", min_verbosity=1)
         return self.loss_, self.weights_, self.bias_
 
-    def _mse(self, X, y):
-        y_pred = self.predict(X)
-        return np.mean(np.square(y - y_pred))
+    def evaluate(
+        self,
+        X_test: np.ndarray,
+        y_test: np.ndarray,
+        evaluation_metric: Literal["mse", "mae"] = "mse",
+    ):
 
-    def _mae(self, X, y):
-        y_pred = self.predict(X)
-        return np.mean(np.abs(y - y_pred))
+        y_pred = self.predict(X_test)
+        y_real = y_test
 
-    def evaluate(self, X, y, evaluation_metric: Literal["mse", "mae"] = "mse"):
-        self.evaluation_metric = evaluation_metric_names.get(evaluation_metric)
-        return self._mse(X, y)
+        evaluation_calculator = self.evaluation_metrics(y_real=y_real, y_pred=y_pred)
+        eval_function = self.evaluation_metric_mapping.get(evaluation_metric)
+
+        return 1 - eval_function(evaluation_calculator)
 
     def _calculate_gradients(self, xi: np.ndarray, yi: np.ndarray):
         y_pred = self.predict(xi)
@@ -156,9 +207,7 @@ class StochasticLinearRegression:
         #    +
         #   [b]
 
-        wi = self.weights_
-
-        y_pred = self.predict(xi)  # (n, 2)
+        y_pred = self.predict(xi)  # (n_sample, n_feautures)
         weight_gradients = -2 * (yi - y_pred) * xi
 
         bias_gradient = -2 * (yi - y_pred)
@@ -193,6 +242,18 @@ class StochasticLinearRegression:
         y_train = X_train * coeff + intercept
         y_test = X_test * coeff + intercept
 
-        ic(f"Weights: {coeff}")
-        ic(f"Bias: {intercept}")
+        X_train, y_train = simultaneous_shuffle(X_train, y_train)
+        X_test, y_test = simultaneous_shuffle(X_test, y_test)
+
+        self.display_info(f"Generated Weights: {coeff}", min_verbosity=1)
+        self.display_info(f"Generated Bias: {intercept}", min_verbosity=1)
         return X_train, y_train, X_test, y_test
+
+    @_decorator_is_model_trained
+    def save_model(self, filename="KNN_model.pkl") -> None:
+
+        save_instance(self, filename=filename)
+
+    def load_model(self, filename="KNN_model.pkl") -> Any:
+
+        return load_instance(filename=filename)
