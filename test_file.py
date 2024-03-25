@@ -11,10 +11,9 @@
 # model.fit(X_train, y_train)
 
 
-
 # prediction = model.predict(X_test)
 # print(prediction)
-# # 
+# #
 # evaluation = model.evaluate(X_test, y_test)
 # print(evaluation)
 
@@ -46,19 +45,34 @@
 # print("Bitcoin Price:", bitcoin_price)
 
 
-from MizuQuruma.Regression import LinearRegression
-from icecream import ic
-import numpy as np
+# from MizuQuruma.Regression import LinearRegression
+# from icecream import ic
+# import numpy as np
 
 
-model = LinearRegression()
-X_train, y_train, X_test, y_test = model.generate_dataset(
-    coeff=[2], intercept=5, n_features=1, n_samples=15
-)
-ic(X_train)
-ic(y_train)
+# model = LinearRegression()
+# X_train, y_train, X_test, y_test = model.generate_dataset(
+#     coeff=[2], intercept=5, n_features=1, n_samples=15
+# )
+# ic(X_train)
+# ic(y_train)
 
-model.fit(X_train, y_train, num_iterations=200, verbosity=1)
-evaluation = model.evaluate(X_test, y_test, evaluation_metric="mse")
-print(evaluation)
+# model.fit(X_train, y_train, num_iterations=200, verbosity=1)
+# evaluation = model.evaluate(X_test, y_test, evaluation_metric="mse")
+# print(evaluation)
 # ic(coeff, intercept, loss)
+
+
+from MizuQuruma.Regression import LogisticRegression
+from icecream import ic
+
+
+model = LogisticRegression()
+
+X_train, y_train = model.generate_dataset(n_samples=10)
+
+
+weights, bias = model.fit(X_train, y_train, num_iterations=1000)
+
+ic(weights)
+ic(bias)

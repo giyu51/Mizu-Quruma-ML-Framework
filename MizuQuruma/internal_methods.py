@@ -322,5 +322,4 @@ def handle_single_feature(X):
 
     if X.ndim == 1:
         X = X.reshape((-1, 1))
-
     return X

@@ -10,7 +10,7 @@ from .internal_methods import (
     to_numpy,
     simultaneous_shuffle,
     display_error,
-    _display_info,
+    display_info,
     display_warning,
     handle_single_feature,
 )
@@ -214,7 +214,7 @@ class LinearRegression:
 
         self.model_is_trained = True
         info_message = "Training is finished succesfully!"
-        _display_info(info_message=info_message)
+        display_info(info_message=info_message)
 
         self._display_info(
             message=f"Loss: {self.loss_}\nWeights: {self.weights_}\nBias: {self.bias_}",
@@ -278,8 +278,8 @@ class LinearRegression:
 
         evaluation_calculator = self.evaluation_metrics(y_real=y_real, y_pred=y_pred)
         eval_function = self.evaluation_metric_mapping.get(evaluation_metric)
-
-        return 1 - eval_function(evaluation_calculator)
+        loss = eval_function(evaluation_calculator)
+        return loss
 
     def _calculate_gradients(self, xi: np.ndarray, yi: np.ndarray):
 
@@ -425,23 +425,92 @@ class LinearRegression:
 
 class LogisticRegression:
     def __init__(self) -> None:
-        pass
+        self.X_train = np.array([])
+        self.y_train = np.array([])
+        self.loss_ = 1
+        self.weights_, self.bias_ = np.random.randn(2)
 
-    def predict(self, X: np.ndarray):
-        prediction = X * self.wights + self.bias
-        mapped_prediction = self.sigmoid_function(prediction)
+    def _sigmoid_function(self, z):
+        return 1 / (1 + np.exp(-z))
 
-        return mapped_prediction
+    def fit(
+        self,
+        X_train: np.ndarray,
+        y_train: np.ndarray,
+        num_iterations: int = 100,
+        learning_rate: int | float = 1e-3,
+    ):
 
-    def _sigmoid_function(self, x):
-        result = 1 / (1 + np.e ^ (-x))
-        return result
+        X_train = handle_single_feature(X_train)
+        
+        self.X_train = X_train
+        self.y_train = y_train
+
+    
+        ic(self.X_train)
+        for iter_count in range(num_iterations):
+            # while self.loss_ > 0.1:
+            for xi, yi in zip(self.X_train, self.y_train):
+                weight_gradients, bias_gradient = self._calculate_gradients(xi, yi)
+
+                self.weights_ -= weight_gradients * learning_rate
+                self.bias_ -= bias_gradient * learning_rate
+                
+                
+                ic(self.weights_)
+                ic(self.bias_)
+                ic("--------------------")
+                # try:
+                np.dot(X_train.reshape(-1,1), self.weights_)
+            break
+                # except:
+                    # ic("NOOOO")
+            self.loss_ = self.evaluate(self.X_train, self.y_train)
+
+            ic(self.loss_)
+
+        return self.weights_, self.bias_
 
     def _calculate_gradients(self, xi: np.ndarray, yi: np.ndarray):
-        y_pred = self.predict(xi)  # (n_sample, n_feautures)
-        weight_gradients = -2 * (yi - y_pred) * xi
-
-        bias_gradient = -2 * (yi - y_pred)
-        # don't multiply by anything because differentiation of a constant results in 1.
-
+        y_pred = self.predict(xi)
+        error = y_pred - yi
+        weight_gradients = np.outer(error, xi)
+        bias_gradient = error
         return weight_gradients, bias_gradient
+
+    def predict(self, X: np.ndarray):
+        linear_combination = np.dot(X, self.weights_ + self.bias_)
+        y_pred = self._sigmoid_function(linear_combination)
+
+        return y_pred
+
+    def generate_dataset(self, n_samples: int):
+        X_first = np.random.rand(n_samples) * 20
+        X_second = np.random.rand(n_samples) * 20 + 20
+
+        y_fist = np.repeat(0, n_samples)
+        y_second = np.repeat(1, n_samples)
+
+        k = 2
+        b = 1
+
+        X_train = np.concatenate((X_first, X_second)) * k + b
+        y_train = np.concatenate((y_fist, y_second))
+
+        return X_train, y_train
+
+    def log_loss(self, y_true, y_pred):
+        epsilon = 1e-15  # Small value to avoid log(0)
+        y_pred = np.clip(
+            y_pred, epsilon, 1 - epsilon
+        )  # Clip predicted probabilities to avoid log(0) or log(1)
+        loss = -np.mean(y_true * np.log(y_pred) + (1 - y_true) * np.log(1 - y_pred))
+        return loss
+
+    def evaluate(self, X_test, y_test):
+        y_real = y_test
+
+        y_pred = self.predict(X_test)
+        loss = self.log_loss(y_real, y_pred)
+
+        return loss
